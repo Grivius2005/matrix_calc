@@ -1,8 +1,3 @@
-
-
-
-
-
-Creators:
-    Grzegorz Wiśniewski
-    Karol Zięba
+# Creators:
+- Grzegorz Wiśniewski
+- Karol Zięba
