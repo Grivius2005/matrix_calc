@@ -1,3 +1,6 @@
 # Creators:
-- Grzegorz Wiśniewski
-- Karol Zięba
+
+* Grzegorz Wiśniewski
+* Karol Zięba
+* Agata Żurek
+
