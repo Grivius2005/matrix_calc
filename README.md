@@ -4,4 +4,4 @@
 * Karol Zięba
 * Agata Żurek
 * Mikołaj Wójtowicz
-*Roland Ząber
+* Roland Ząber
