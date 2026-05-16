@@ -3,4 +3,5 @@
 * Grzegorz Wiśniewski
 * Karol Zięba
 * Agata Żurek
+* Mikołaj Wójtowicz
 
