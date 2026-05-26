@@ -1,5 +1,8 @@
-# Creators:
 
+# Branch author
+* Grzegorz Wiśniewski
+
+# Creators:
 * Grzegorz Wiśniewski
 * Karol Zięba
 * Agata Żurek
