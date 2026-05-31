@@ -1,0 +1,64 @@
+@startuml
+
+enum DetMethod
+{
+ GAUSSIAN
+ LAPLACE
+}
+
+
+ 
+
+class Matrix
+{
+ - list[list[float]] __matrix
+ + Matrix()
+ + <<operator>> = (matrix2 : Matrix)
+ + <<operator>> == (matrix2 : Matrix)
+ + <<operator>> + (matrix2 : Matrix)
+ + <<operator>> - (matrix2 : Matrix)
+ + <<operator>> * (matrix2 : Matrix)
+ + <<operator>> * (s : float)
+ + <<operator>> ^ (k : int)
+ + tuple[int, int] size()
+ + float determinant(method : DetMethod)
+ + float trace()
+ + int rank()
+ + Matrix transpose()
+ + Matrix cofactor()
+ + Matrix symmetric()
+ + tuple[P : Matrix, J : Matrix, P_inv : Matrix] jordan()
+ {static} bool have_same_size(a : Matrix, b : Matrix)
+ {static} bool can_be_multiplied(a : Matrix, b : Matrix)
+}
+
+
+
+class OperationModel
+{
+ + int opId
+ + Matrix matrix1
+ + Matrix matrix2
+ + Matrix result
+}
+
+class Memory
+{
+ - list[OperationModel] __memory
+ + Memory(size : int)
+ + <<operator>> get[] (key : int)
+ + <<operator>> set[] (key : int, value : OperationModel)
+ + int size()
+ + void addOp(op : OperationModel)
+ + void clear()
+ + str toStrJSON()
+}
+
+
+
+Matrix ..> DetMethod
+Matrix -- OperationModel
+OperationModel *-- Memory
+
+
+@enduml
