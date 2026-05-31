@@ -1,5 +1,7 @@
 #klasa  Matrix :)
 
+import numpy as np
+
 class Matrix:
     def __init__(self, rows: int = None, cols: int = None, operated_matrix: list[list[float]] = None):
         if operated_matrix is not None:
@@ -36,6 +38,13 @@ class Matrix:
 
     def is_it_ok_to_multiply(self, matrix2) -> bool:
         return len(self.operated_matrix[0]) == len(matrix2.operated_matrix) #dostosować nazwę pola matrix
+
+    def __mul__(self, other):
+        if self.is_it_ok_to_multiply(other):
+            result = np.array(self.operated_matrix) @ np.array(other.operated_matrix)
+            return Matrix(operated_matrix=result.tolist())
+        else:
+            raise ValueError("Niezgodne wymiary macierzy")
 
     def which_power_method(self, method: str) -> int:
         methods = {"Jordan": 1, "multiply": 2}
