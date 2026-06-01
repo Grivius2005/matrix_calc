@@ -40,6 +40,26 @@ class Matrix:
             raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
         return sum(self.__matrix[i][i] for i in range(rows))
 
+    def rank(self) -> int:
+        mat = copy.deepcopy(self.__matrix)
+        rows, cols = self.size() #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        r = 0
+        for c in range(cols):
+            if r >= rows:
+                break
+            pivot = r
+            while pivot < rows and abs(mat[pivot][c]) < 1e-9:
+                pivot += 1
+
+            if pivot < rows:
+                mat[r], mat[pivot] = mat[pivot], mat[r]
+                for i in range(r + 1, rows):
+                    factor = mat[i][c] / mat[r][c]
+                    for j in range(c, cols):
+                        mat[i][j] -= factor * mat[r][j]
+                r += 1
+        return r
+
     def which_power_method(self, method: str) -> int:
         methods = {"Jordan": 1, "multiply": 2}
         return methods.get(method) #to nie ma sensu
