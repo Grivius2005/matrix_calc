@@ -34,6 +34,12 @@ class Matrix:
         else:
             raise ValueError("Niezgodne wymiary macierzy")
 
+    def trace(self) -> float:
+        rows, cols = self.size()    #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        if rows != cols:
+            raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
+        return sum(self.__matrix[i][i] for i in range(rows))
+
     def which_power_method(self, method: str) -> int:
         methods = {"Jordan": 1, "multiply": 2}
         return methods.get(method) #to nie ma sensu
