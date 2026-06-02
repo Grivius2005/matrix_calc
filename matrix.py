@@ -1,10 +1,9 @@
 #klasa  Matrix :)
-
+from typing import Union
 import numpy as np
 from sympy import Matrix as SymMatrix
 import copy
 from enum import Enum
-
 class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
@@ -30,16 +29,27 @@ class Matrix:
         else:
             self.__matrix = []
 
+    def __add__(self, matrix2: Matrix) -> Matrix:
+        if not Matrix.have_same_size(self, matrix2):
+            raise ValueError("Macierze muszą mieć te same wymiary, aby je dodać.")
+        result_data = [
+            [self.__matrix[i][j] + matrix2.data[i][j] for j in range(len(self.__matrix[0]))]
+            for i in range(len(self.__matrix))
+        ]
+        return Matrix(result_data)
+
     def is_it_ok_to_multiply(self, matrix2) -> bool:
         return len(self.__matrix[0]) == len(matrix2.__matrix) #dostosować nazwę pola matrix
 
-    def __mul__(self, other):
-        if isinstance(other, Matrix):
-            if self.is_it_ok_to_multiply(other):
-                result = np.array(self.__matrix) @ np.array(other.__matrix)
-                return Matrix(_matrix = result.tolist())
-            else:
-                raise ValueError("Niezgodne wymiary macierzy")
+    def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
+        if isinstance(other, (float, int)):
+            # Mnożenie przez skalar
+            result_data = [[val * other for val in row] for row in self.__matrix]
+            return Matrix(result_data)
+        elif isinstance(other, Matrix):
+            # Mnożenie macierzy przez macierz
+            if not Matrix.can_be_multiplied(self, other):
+                raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
 
     def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
         if len(self.__matrix[0]) != len(self.__matrix):
@@ -95,4 +105,19 @@ class Matrix:
                 r += 1
         return r
 
+    def transpose(self) -> "Matrix":
+        rows, cols = self.size()
+        transposed_data = [[self.__matrix[j][i] for j in range(rows)] for i in range(cols)]
+        return Matrix(transposed_data)
 
+    def __sub__(self, matrix2: Matrix) -> Matrix:
+        if not Matrix.have_same_size(self, matrix2):
+            raise ValueError("Macierze muszą mieć te same wymiary, aby je odjąć.")
+        result_data = [
+            [self.__matrix[i][j] - matrix2.data[i][j] for j in range(len(self.__matrix[0]))]
+            for i in range(len(self.__matrix))
+        ]
+        return Matrix(result_data)
+    @staticmethod
+    def have_same_size(a: Matrix, b: Matrix) -> bool:
+        return a.size() == b.size()
