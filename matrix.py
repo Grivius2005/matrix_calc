@@ -57,7 +57,7 @@ class Matrix:
 
         if method == PowMethod.JORDAN:
             if method == PowMethod.JORDAN:
-                j_mat, pinv_mat = jordan(self)
+                j_mat, pinv_mat = jordan(self) #blad do sprawdzenia
 
                 sym_j = SymMatrix(j_mat._Matrix__matrix)
 
@@ -95,4 +95,20 @@ class Matrix:
                 r += 1
         return r
 
+    def cofactor(self) -> Matrix:
+        rows, cols = self.size() #metoda do stworzenia
+        if rows != cols:
+            raise ValueError("Macierz dopełnień istnieje tylko dla macierzy kwadratowych.")
 
+        cofactor_data = []
+        for i in range(rows):
+            cofactor_row = []
+            for j in range(cols):
+                minor = [r[:j] + r[j + 1:] for idx, r in enumerate(self.__matrix) if idx != i]
+                minor_det = self._det_laplace(minor) if minor else 1.0 #metoda do stworzernia
+                cofactor_row.append(((-1) ** (i + j)) * minor_det)
+            cofactor_data.append(cofactor_row)
+
+        return Matrix(cofactor_data)
+
+#w kodzie jest kilka errorów
