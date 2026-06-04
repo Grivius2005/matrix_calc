@@ -39,7 +39,9 @@ class Matrix:
         return Matrix(result_data)
 
     def is_it_ok_to_multiply(self, matrix2) -> bool:
-        return len(self.__matrix[0]) == len(matrix2.__matrix) #dostosować nazwę pola matrix
+        row1, col1 = self.size()
+        row2, col2 = matrix2.size()
+        return col1 == row2
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
         if isinstance(other, (float, int)):
