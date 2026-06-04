@@ -4,6 +4,7 @@ import numpy as np
 from sympy import Matrix as SymMatrix
 import copy
 from enum import Enum
+
 class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
@@ -39,8 +40,9 @@ class Matrix:
         return Matrix(result_data)
 
     def is_it_ok_to_multiply(self, matrix2) -> bool:
-        row1, col1 = self.size()
-        row2, col2 = matrix2.size()
+        row1, col1 = self.size() # size do implementacji
+        row2, col2 = matrix2.size() #size do implementacji
+        #warunek mnorzenia Macierzy
         return col1 == row2
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
@@ -50,11 +52,15 @@ class Matrix:
             return Matrix(result_data)
         elif isinstance(other, Matrix):
             # Mnożenie przez macierz
-            if self.is_it_ok_to_multiply(other):
-                result = np.array(self.__matrix) @ np.array(other.__matrix)
-                return Matrix(_matrix = result.tolist())
-            else:
+            if not self.is_it_ok_to_multiply(other):
                 raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
+            #zamiana na obiekty biblioteki numpy
+            mat1_np = np.array(self.__matrix)
+            mat2_np = np.array(other.__matrix)
+            #wykorzystanie funkcji mnozenia macierzy z biblioteki numpy
+            result = mat1_np @ mat2_np
+            #zwrocony wynik przekonwertowany z powrotem na obiekt klasy Matrix
+            return Matrix(_matrix = result.tolist())
 
     def inverse(self):
         if len(self.__matrix[0]) != len(self.__matrix):
