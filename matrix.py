@@ -77,7 +77,8 @@ class Matrix:
         return Matrix(inv.tolist())
 
     def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
-        if len(self.__matrix[0]) != len(self.__matrix):
+        row, col = self.size()
+        if row != col:
             raise ValueError("Niezgodne wymiary macierzy")
 
         if n < 0:
@@ -85,7 +86,7 @@ class Matrix:
             return inverse_mat.__pow__(-n, method)
 
         if method == PowMethod.MULTIPLY:
-            result = Matrix(rows=len(self.__matrix), cols=len(self.__matrix))
+            result = Matrix(rows=row, cols=col)
             for k in range(n):
                 result = result * self
             return result
