@@ -3,12 +3,13 @@
 
 import sys
 
-from PySide6.QtWidgets import QMainWindow, QApplication, QToolBar, QStackedWidget, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QApplication, QToolBar, QStackedWidget, QWidget, QGridLayout, QLabel, \
+    QDoubleSpinBox, QSpinBox, QAbstractSpinBox
 from PySide6.QtGui import QIcon, QAction, QFont, Qt
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         #Toolbar
@@ -48,8 +49,8 @@ class MainWindow(QMainWindow):
 
         self.test_widget1 = QWidget()
         self.test_widget2 = QWidget()
-        grid1 = QGridLayout()
-        grid2 = QGridLayout()
+        grid1 = QGridLayout(self.test_widget1)
+        grid2 = QGridLayout(self.test_widget2)
 
         grid1.addWidget(QLabel("Test view 1"), 0,0, alignment=Qt.AlignmentFlag.AlignCenter)
         grid2.addWidget(QLabel("Test view 2"), 0,0, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -59,17 +60,40 @@ class MainWindow(QMainWindow):
 
         self.stack.addWidget(self.test_widget1)
         self.stack.addWidget(self.test_widget2)
+        self.stack.addWidget(self.generate_input_grid(5, 3, []))
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
         add_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(0))
         substract_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(1))
+        timesk_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
         self.resize(1280, 720)
         self.setWindowIcon(QIcon("icons/icon.png"))
 
+    @staticmethod
+    def generate_input_grid(rows: int, cols: int, inputs_container: list[list[QDoubleSpinBox]]) -> QWidget:
+        input_widget = QWidget()
+
+        grid = QGridLayout(input_widget)
+        input_widget.setLayout(grid)
+
+        for row in range(rows):
+            row_input = []
+            for col in range(cols):
+                m_input = QDoubleSpinBox()
+                m_input.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+                m_input.setFixedSize(125, 25)
+                m_input.setSingleStep(0.1)
+                m_input.setDecimals(4)
+                m_input.setRange(-9999, 9999)
+                m_input.setValue(0.0)
+                row_input.append(m_input)
+                grid.addWidget(m_input, row, col)
+            inputs_container.append(row_input)
+        return input_widget
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
