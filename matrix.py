@@ -32,9 +32,10 @@ class Matrix:
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
             raise ValueError("Macierze muszą mieć te same wymiary, aby je dodać.")
+        rows, cols = self.size()
         result_data = [
-            [self.__matrix[i][j] + matrix2.__matrix[i][j] for j in range(len(self.__matrix[0]))]
-            for i in range(len(self.__matrix))
+            [self.__matrix[i][j] + matrix2.__matrix[i][j] for j in range(cols)]
+            for i in range(rows)
         ]
         return Matrix(result_data)
 
@@ -44,9 +45,13 @@ class Matrix:
         return col1 == row2
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
+        # Mnożenie przez skalar
         if isinstance(other, (float, int)):
-            # Mnożenie przez skalar
-            result_data = [[val * other for val in row] for row in self.__matrix]
+            rows, cols = self.size()
+            result_data = [
+                [self.__matrix[i][j] * other for j in range(cols)]
+                for i in range(rows)
+            ]
             return Matrix(result_data)
         elif isinstance(other, Matrix):
             # Mnożenie przez macierz
@@ -126,12 +131,18 @@ class Matrix:
     def __sub__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
             raise ValueError("Macierze muszą mieć te same wymiary, aby je odjąć.")
+        rows, cols = self.size()
         result_data = [
-            [self.__matrix[i][j] - matrix2.__matrix[i][j] for j in range(len(self.__matrix[0]))]
-            for i in range(len(self.__matrix))
+            [self.__matrix[i][j] - matrix2.__matrix[i][j] for j in range(cols)]
+            for i in range(rows)
         ]
         return Matrix(result_data)
 
     @staticmethod
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
+
+    def size(self) -> tuple[int, int]:
+        rows = len(self.__matrix)
+        cols = len(self.__matrix[0]) if rows > 0 else 0
+        return rows, cols
