@@ -8,17 +8,6 @@ class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
 
-class OpType(Enum):
-    ADD = 1
-    SUB = 2
-    MUL = 3
-    POW = 4
-    INV = 5
-    TRANS = 6
-class MatrixOperation:
-    def __init__(self, op_type: OpType):
-        self.op_type: OpType = op_type
-
 class Matrix:
     def __init__(self, _matrix: list[list[float]] = None, rows: int = None, cols: int = None):
         if _matrix is not None:
@@ -39,6 +28,10 @@ class Matrix:
 
         else:
             self.__matrix = []
+
+    @property
+    def data(self) -> list[list[float]]:
+        return self.__matrix
 
     #brak __eq__ do stworzenia???
 
@@ -147,8 +140,9 @@ class Matrix:
     def cofactor(self) -> "Matrix":
         rows, cols = self.size()
         if rows != cols:
-            return False
+            raise ValueError("Macierz dopełnień istnieje tylko dla macierzy kwadratowych.")
 
+        cofactor_data = []
         for i in range(rows):
             cofactor_row = []
             for j in range(cols):
