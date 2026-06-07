@@ -5,13 +5,14 @@ import sys
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QToolBar, QStackedWidget, QWidget, QGridLayout, QLabel, \
     QDoubleSpinBox, QHBoxLayout, QSpinBox, QVBoxLayout, QPushButton
-from PySide6.QtGui import QIcon, QAction, QFont, Qt
+from PySide6.QtGui import QIcon, QAction, QFont, Qt, QGuiApplication
 
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
+        #Fields
         self.rows1 = 3
         self.rows2 = 3
         self.cols1 = 3
@@ -20,7 +21,6 @@ class MainWindow(QMainWindow):
         self.add_inputs1 = []
         self.add_inputs2 = []
         self.add_result = []
-
 
         #Toolbar
         toolbar = QToolBar("Toolbar")
@@ -76,11 +76,14 @@ class MainWindow(QMainWindow):
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
-        self.resize(1280, 720)
+        self.resize(1024, 576)
         self.setWindowIcon(QIcon("icons/icon.png"))
+
 
     def __gen_add_view(self) -> QWidget:
         add_view = QWidget()
+        add_view.setContentsMargins(75, 75, 75, 75)
+
         v_layout = QVBoxLayout(add_view)
         add_view.setLayout(v_layout)
 
@@ -96,7 +99,7 @@ class MainWindow(QMainWindow):
 
         rows_input = QSpinBox()
         rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        rows_input.setFixedSize(75, 75)
+        rows_input.setFixedSize(75, 25)
         rows_input.lineEdit().setReadOnly(True)
         rows_input.setRange(1, 5)
         rows_input.setValue(self.rows1)
@@ -109,7 +112,7 @@ class MainWindow(QMainWindow):
 
         cols_input = QSpinBox()
         cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        cols_input.setFixedSize(75, 75)
+        cols_input.setFixedSize(75, 25)
         cols_input.lineEdit().setReadOnly(True)
         cols_input.setRange(1, 5)
         cols_input.setValue(self.cols1)
@@ -144,8 +147,11 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(main_area, 5)
 
         add_button = QPushButton("Add")
+        add_button.setFixedWidth(200)
+        add_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        v_layout.addWidget(add_button)
+
+        v_layout.addWidget(add_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return add_view
 
@@ -156,6 +162,8 @@ class MainWindow(QMainWindow):
             inputs_container = []
         input_widget = QWidget()
         grid = QGridLayout(input_widget)
+        grid.setHorizontalSpacing(25)
+        grid.setVerticalSpacing(25)
         input_widget.setLayout(grid)
 
         for row in range(rows):
@@ -169,6 +177,7 @@ class MainWindow(QMainWindow):
                 m_input.setRange(-9999, 9999)
                 m_input.setValue(0.0)
                 m_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
                 if read_only:
                     m_input.setReadOnly(True)
                 row_input.append(m_input)
