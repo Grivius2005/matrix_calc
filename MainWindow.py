@@ -21,6 +21,9 @@ class MainWindow(QMainWindow):
         self.add_inputs1 = []
         self.add_inputs2 = []
         self.add_result = []
+        self.subtract_inputs1 = []
+        self.subtract_inputs2 = []
+        self.subtract_result = []
 
         #Toolbar
         toolbar = QToolBar("Toolbar")
@@ -57,22 +60,16 @@ class MainWindow(QMainWindow):
         #StackWidget
         self.stack = QStackedWidget()
 
-        self.test_widget2 = QWidget()
-        grid2 = QGridLayout(self.test_widget2)
-
-        grid2.addWidget(QLabel("Test view 2"), 0,0, alignment=Qt.AlignmentFlag.AlignCenter)
-
-        self.test_widget2.setLayout(grid2)
 
         self.stack.addWidget(self.__gen_add_view())
-        self.stack.addWidget(self.test_widget2)
+        self.stack.addWidget(self.__gen_subtract_view())
         self.stack.addWidget(self.generate_input_grid(3, 3, []))
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
-        add_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(0))
-        substract_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(1))
-        timesk_view_option.triggered.connect(lambda: self.stack.setCurrentIndex(2))
+        add_view_option.triggered.connect(lambda: self.change_refresh_view(0, self.rows1, self.cols1, self.rows2, self.cols2))
+        substract_view_option.triggered.connect(lambda: self.change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
+        timesk_view_option.triggered.connect(lambda: self.change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -119,8 +116,8 @@ class MainWindow(QMainWindow):
 
         h_layout.addWidget(cols_input)
 
-        rows_input.valueChanged.connect(lambda: self.on_matrix_size_change(0, rows_input.value(), cols_input.value()))
-        cols_input.valueChanged.connect(lambda: self.on_matrix_size_change(0, rows_input.value(), cols_input.value()))
+        rows_input.valueChanged.connect(lambda: self.change_refresh_view(0, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.change_refresh_view(0, rows_input.value(), cols_input.value()))
         v_layout.addWidget(header)
 
         main_area = QWidget()
@@ -158,8 +155,86 @@ class MainWindow(QMainWindow):
 
         return add_view
 
+    def __gen_subtract_view(self) -> QWidget:
+        subtract_view = QWidget()
+        subtract_view.setContentsMargins(25, 25, 25, 25)
 
-    def on_matrix_size_change(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
+        v_layout = QVBoxLayout(subtract_view)
+        subtract_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.change_refresh_view(1, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.change_refresh_view(1, rows_input.value(), cols_input.value()))
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        subtract_input1 = self.generate_input_grid(self.rows1, self.cols1, self.add_inputs1)
+        h_layout.addWidget(subtract_input1, 5)
+
+        minus_label = QLabel("-")
+        minus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        minus_label.setFont(QFont("Courier New", 30))
+        h_layout.addWidget(minus_label)
+
+        subtract_input2 = self.generate_input_grid(self.rows1, self.cols1, self.add_inputs2)
+        h_layout.addWidget(subtract_input2, 5)
+
+        eq_label = QLabel("=")
+        eq_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        eq_label.setFont(QFont("Courier New", 30))
+        h_layout.addWidget(eq_label)
+
+        add_result = self.generate_input_grid(self.rows1, self.cols1, self.add_result, True)
+        h_layout.addWidget(add_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        subtract_button = QPushButton("Subtract")
+        subtract_button.setFixedSize(250, 50)
+        subtract_button.setFont(QFont("Courier New", 25))
+        subtract_button.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        v_layout.addWidget(subtract_button, alignment = Qt.AlignmentFlag.AlignCenter)
+
+        return subtract_view
+
+
+    def change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
         self.cols1 = cols1
         if rows2 is not None:
@@ -174,6 +249,8 @@ class MainWindow(QMainWindow):
         match view_index:
             case 0:
                 self.stack.insertWidget(view_index, self.__gen_add_view())
+            case 1:
+                self.stack.insertWidget(view_index, self.__gen_subtract_view())
             case _:
                 pass
 
