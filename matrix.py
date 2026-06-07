@@ -4,6 +4,7 @@ import numpy as np
 from sympy import Matrix as SymMatrix
 import copy
 from enum import Enum
+
 class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
@@ -54,6 +55,12 @@ class Matrix:
             for i in range(rows)
         ]
         return Matrix(result_data)
+      
+    def is_it_ok_to_multiply(self, matrix2) -> bool:
+        row1, col1 = self.size() # size do implementacji
+        row2, col2 = matrix2.size() #size do implementacji
+        #warunek mnorzenia Macierzy
+        return col1 == row2
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
         # Mnożenie przez skalar
@@ -66,14 +73,19 @@ class Matrix:
             return Matrix(result_data)
         elif isinstance(other, Matrix):
             # Mnożenie przez macierz
-            if self.is_it_ok_to_multiply(other):
-                result = np.array(self.__matrix) @ np.array(other.__matrix)
-                return Matrix(_matrix = result.tolist())
-            else:
+            if not self.is_it_ok_to_multiply(other):
                 raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
+            #zamiana na obiekty biblioteki numpy
+            mat1_np = np.array(self.__matrix)
+            mat2_np = np.array(other.__matrix)
+            #wykorzystanie funkcji mnozenia macierzy z biblioteki numpy
+            result = mat1_np @ mat2_np
+            #zwrocony wynik przekonwertowany z powrotem na obiekt klasy Matrix
+            return Matrix(_matrix = result.tolist())
 
     def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
-        if len(self.__matrix[0]) != len(self.__matrix):
+        row, col = self.size()
+        if row != col:
             raise ValueError("Niezgodne wymiary macierzy")
 
         if n < 0:
@@ -81,7 +93,7 @@ class Matrix:
             return inverse_mat.__pow__(-n, method)
 
         if method == PowMethod.MULTIPLY:
-            result = Matrix(rows=len(self.__matrix), cols=len(self.__matrix))
+            result = Matrix(rows=row, cols=col)
             for k in range(n):
                 result = result * self
             return result
@@ -161,12 +173,8 @@ class Matrix:
         inv = np.linalg.inv(np_mat)
         return Matrix(inv.tolist())
 
-    def is_it_ok_to_multiply(self, matrix2) -> bool:
-        row1, col1 = self.size()
-        row2, col2 = matrix2.size()
-        return col1 == row2
-
     @staticmethod
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
+
 
