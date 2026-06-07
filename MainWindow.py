@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
 
 
     def __gen_add_view(self) -> QWidget:
-        print(self.rows1, self.cols1)
         add_view = QWidget()
         add_view.setContentsMargins(25, 25, 25, 25)
 
@@ -167,13 +166,18 @@ class MainWindow(QMainWindow):
             self.rows2 = rows2
         if cols2 is not None:
             self.cols2 = cols2
+
+        old_widget = self.stack.widget(view_index)
+        self.stack.removeWidget(old_widget)
+        old_widget.deleteLater()
+
         match view_index:
             case 0:
                 self.stack.insertWidget(view_index, self.__gen_add_view())
-                self.stack.setCurrentIndex(view_index)
             case _:
                 pass
 
+        self.stack.setCurrentIndex(view_index)
 
     @staticmethod
     def generate_input_grid(rows: int, cols: int, inputs_container = None, read_only = False) -> QWidget:
