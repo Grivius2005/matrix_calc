@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         self.addToolBar(toolbar)
 
         add_view_option = QAction("+", self)
-        substract_view_option = QAction("-", self)
+        subtract_view_option = QAction("-", self)
         timesk_view_option = QAction("s*", self)
         timesm_view_option = QAction("M*", self)
         transpose_view_option = QAction("Tr", self)
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         unit_view_option = QAction("I", self)
 
         toolbar.addAction(add_view_option)
-        toolbar.addAction(substract_view_option)
+        toolbar.addAction(subtract_view_option)
         toolbar.addAction(timesk_view_option)
         toolbar.addAction(timesm_view_option)
         toolbar.addAction(transpose_view_option)
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
 
         #Toolbar connection
         add_view_option.triggered.connect(lambda: self.change_refresh_view(0, self.rows1, self.cols1, self.rows2, self.cols2))
-        substract_view_option.triggered.connect(lambda: self.change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
+        subtract_view_option.triggered.connect(lambda: self.change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
         timesk_view_option.triggered.connect(lambda: self.change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
@@ -224,7 +224,7 @@ class MainWindow(QMainWindow):
 
         v_layout.addWidget(main_area, 5)
 
-        subtract_button = QPushButton("Subtract")
+        subtract_button = QPushButton("subtract")
         subtract_button.setFixedSize(250, 50)
         subtract_button.setFont(QFont("Courier New", 25))
         subtract_button.setCursor(Qt.CursorShape.PointingHandCursor)
