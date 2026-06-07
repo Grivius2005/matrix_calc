@@ -120,8 +120,10 @@ class Matrix:
 
     def trace(self) -> float:
         rows, cols = self.size()
+        #sprawdzenie czy macierz jest kwadratowa
         if rows != cols:
             raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
+        #zwraca sumę elementów na głównej przekątnej
         return sum(self.__matrix[i][i] for i in range(rows))
 
     def rank(self) -> int:
