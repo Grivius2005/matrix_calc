@@ -165,12 +165,17 @@ class Matrix:
         return Matrix(cofactor_data)
 
     def inverse(self):
-        if len(self.__matrix[0]) != len(self.__matrix):
+        rows, cols = self.size()
+        #sprawdzenmie czy macierz jest kwadratowa
+        if rows != cols:
             raise ValueError("Niezgodne wymiary macierzy")
-        if abs(self.determinant()) < 1e-12:
+        #sprawdzenie czy wyznacznik nie jest  0
+        if abs(self.determinant()) < 1e-12: #brak metody determinant
             raise ValueError("Macierz ma zerowy wyznacznik")
+        #konwersja na np.array i obliczenie odwrotności
         np_mat = np.array(self.__matrix)
         inv = np.linalg.inv(np_mat)
+        #wynik zwracany jako obiekt klasy Matrix
         return Matrix(inv.tolist())
 
     @staticmethod
