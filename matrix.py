@@ -107,14 +107,14 @@ class Matrix:
     #brak metody determinant
 
     def trace(self) -> float:
-        rows, cols = self.size()    #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        rows, cols = self.size()
         if rows != cols:
             raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
         return sum(self.__matrix[i][i] for i in range(rows))
 
     def rank(self) -> int:
         mat = copy.deepcopy(self.__matrix)
-        rows, cols = self.size() #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        rows, cols = self.size()
         r = 0
         for c in range(cols):
             if r >= rows:
