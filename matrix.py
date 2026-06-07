@@ -1,9 +1,10 @@
 #klasa  Matrix :)
-from typing import Union
+
 import numpy as np
 from sympy import Matrix as SymMatrix
 import copy
 from enum import Enum
+
 class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
@@ -29,73 +30,44 @@ class Matrix:
         else:
             self.__matrix = []
 
-    def __add__(self, matrix2: Matrix) -> Matrix:
-        if not Matrix.have_same_size(self, matrix2):
-            raise ValueError("Macierze muszą mieć te same wymiary, aby je dodać.")
-        rows, cols = self.size()
-        result_data = [
-            [self.__matrix[i][j] + matrix2.__matrix[i][j] for j in range(cols)]
-            for i in range(rows)
-        ]
-        return Matrix(result_data)
-
     def is_it_ok_to_multiply(self, matrix2) -> bool:
-        row1, col1 = self.size()
-        row2, col2 = matrix2.size()
-        return col1 == row2
+        return len(self.__matrix[0]) == len(matrix2.__matrix) #dostosować nazwę pola matrix
 
-    def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
-        # Mnożenie przez skalar
-        if isinstance(other, (float, int)):
-            rows, cols = self.size()
-            result_data = [
-                [self.__matrix[i][j] * other for j in range(cols)]
-                for i in range(rows)
-            ]
-            return Matrix(result_data)
-        elif isinstance(other, Matrix):
-            # Mnożenie przez macierz
+    def __mul__(self, other):
+        if isinstance(other, Matrix):
             if self.is_it_ok_to_multiply(other):
                 result = np.array(self.__matrix) @ np.array(other.__matrix)
                 return Matrix(_matrix = result.tolist())
             else:
-                raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
-
-    def inverse(self):
-        if len(self.__matrix[0]) != len(self.__matrix):
-            raise ValueError("Niezgodne wymiary macierzy")
-        if abs(self.determinant()) < 1e-12:
-            raise ValueError("Macierz ma zerowy wyznacznik")
-        np_mat = np.array(self.__matrix)
-        inv = np.linalg.inv(np_mat)
-        return Matrix(inv.tolist())
+                raise ValueError("Niezgodne wymiary macierzy")
 
     def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
         if len(self.__matrix[0]) != len(self.__matrix):
             raise ValueError("Niezgodne wymiary macierzy")
 
         if n < 0:
-            inverse_mat = self.inverse()
+            inverse_mat = inverse(self) #funkcja inverse do zaimplementowania
             return inverse_mat.__pow__(-n, method)
 
         if method == PowMethod.MULTIPLY:
-            result = Matrix(rows=len(self.__matrix), cols=len(self.__matrix))
+            result = Matrix([[1.0 if i == j else 0.0 for j in range(len(self.__matrix[0]))] for i in range(len(self.__matrix))])
             for k in range(n):
                 result = result * self
             return result
 
         if method == PowMethod.JORDAN:
-            j_mat, pinv_mat = jordan(self)
+            if method == PowMethod.JORDAN:
+                j_mat, pinv_mat = jordan(self) #blad do sprawdzenia
 
-            sym_j = SymMatrix(j_mat._Matrix__matrix)
+                sym_j = SymMatrix(j_mat._Matrix__matrix)
 
-            sym_j_pow = sym_j ** n
+                sym_j_pow = sym_j ** n
 
-            j_pow = Matrix(sym_j_pow.tolist())
+                j_pow = Matrix(sym_j_pow.tolist())
 
-            p_mat = pinv_mat ** (-1)
+                p_mat = pinv_mat ** (-1)
 
-            return p_mat * j_pow * pinv_mat
+                return p_mat * j_pow * pinv_mat
 
     def trace(self) -> float:
         rows, cols = self.size()    #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
@@ -123,26 +95,20 @@ class Matrix:
                 r += 1
         return r
 
-    def transpose(self) -> "Matrix":
-        rows, cols = self.size()
-        transposed_data = [[self.__matrix[j][i] for j in range(rows)] for i in range(cols)]
-        return Matrix(transposed_data)
+    def cofactor(self) -> Matrix:
+        rows, cols = self.size() #metoda do stworzenia
+        if rows != cols:
+            raise ValueError("Macierz dopełnień istnieje tylko dla macierzy kwadratowych.")
 
-    def __sub__(self, matrix2: Matrix) -> Matrix:
-        if not Matrix.have_same_size(self, matrix2):
-            raise ValueError("Macierze muszą mieć te same wymiary, aby je odjąć.")
-        rows, cols = self.size()
-        result_data = [
-            [self.__matrix[i][j] - matrix2.__matrix[i][j] for j in range(cols)]
-            for i in range(rows)
-        ]
-        return Matrix(result_data)
+        cofactor_data = []
+        for i in range(rows):
+            cofactor_row = []
+            for j in range(cols):
+                minor = [r[:j] + r[j + 1:] for idx, r in enumerate(self.__matrix) if idx != i]
+                minor_det = self._det_laplace(minor) if minor else 1.0 #metoda do stworzernia
+                cofactor_row.append(((-1) ** (i + j)) * minor_det)
+            cofactor_data.append(cofactor_row)
 
-    @staticmethod
-    def have_same_size(a: Matrix, b: Matrix) -> bool:
-        return a.size() == b.size()
+        return Matrix(cofactor_data)
 
-    def size(self) -> tuple[int, int]:
-        rows = len(self.__matrix)
-        cols = len(self.__matrix[0]) if rows > 0 else 0
-        return rows, cols
+#w kodzie jest kilka errorów
