@@ -40,6 +40,8 @@ class Matrix:
         else:
             self.__matrix = []
 
+    #brak __eq__ do stworzenia???
+
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
             raise ValueError("Macierze muszą mieć te same wymiary, aby je dodać.")
@@ -50,10 +52,15 @@ class Matrix:
         ]
         return Matrix(result_data)
 
-    def is_it_ok_to_multiply(self, matrix2) -> bool:
-        row1, col1 = self.size()
-        row2, col2 = matrix2.size()
-        return col1 == row2
+    def __sub__(self, matrix2: Matrix) -> Matrix:
+        if not Matrix.have_same_size(self, matrix2):
+            raise ValueError("Macierze muszą mieć te same wymiary, aby je odjąć.")
+        rows, cols = self.size()
+        result_data = [
+            [self.__matrix[i][j] - matrix2.__matrix[i][j] for j in range(cols)]
+            for i in range(rows)
+        ]
+        return Matrix(result_data)
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
         # Mnożenie przez skalar
@@ -72,15 +79,6 @@ class Matrix:
             else:
                 raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
 
-    def inverse(self):
-        if len(self.__matrix[0]) != len(self.__matrix):
-            raise ValueError("Niezgodne wymiary macierzy")
-        if abs(self.determinant()) < 1e-12:
-            raise ValueError("Macierz ma zerowy wyznacznik")
-        np_mat = np.array(self.__matrix)
-        inv = np.linalg.inv(np_mat)
-        return Matrix(inv.tolist())
-
     def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
         if len(self.__matrix[0]) != len(self.__matrix):
             raise ValueError("Niezgodne wymiary macierzy")
@@ -96,7 +94,7 @@ class Matrix:
             return result
 
         if method == PowMethod.JORDAN:
-            j_mat, pinv_mat = jordan(self)
+            j_mat, pinv_mat = jordan(self) #co z jordanem????
 
             sym_j = SymMatrix(j_mat._Matrix__matrix)
 
@@ -107,6 +105,13 @@ class Matrix:
             p_mat = pinv_mat ** (-1)
 
             return p_mat * j_pow * pinv_mat
+
+    def size(self) -> tuple[int, int]:
+        rows = len(self.__matrix)
+        cols = len(self.__matrix[0]) if rows > 0 else 0
+        return rows, cols
+
+    #brak metody determinant
 
     def trace(self) -> float:
         rows, cols = self.size()
@@ -139,34 +144,35 @@ class Matrix:
         transposed_data = [[self.__matrix[j][i] for j in range(rows)] for i in range(cols)]
         return Matrix(transposed_data)
 
-    def __sub__(self, matrix2: Matrix) -> Matrix:
-        if not Matrix.have_same_size(self, matrix2):
-            raise ValueError("Macierze muszą mieć te same wymiary, aby je odjąć.")
+    def cofactor(self) -> "Matrix":
         rows, cols = self.size()
-        result_data = [
-            [self.__matrix[i][j] - matrix2.__matrix[i][j] for j in range(cols)]
-            for i in range(rows)
-        ]
-        return Matrix(result_data)
+        if rows != cols:
+            return False
+
+        for i in range(rows):
+            cofactor_row = []
+            for j in range(cols):
+                minor = [r[:j] + r[j + 1:] for idx, r in enumerate(self.__matrix) if idx != i]
+                minor_det = self.determinant(minor) if minor else 1.0 #brak metody determinant
+                cofactor_row.append(((-1) ** (i + j)) * minor_det)
+            cofactor_data.append(cofactor_row)
+        return Matrix(cofactor_data)
+
+    def inverse(self):
+        if len(self.__matrix[0]) != len(self.__matrix):
+            raise ValueError("Niezgodne wymiary macierzy")
+        if abs(self.determinant()) < 1e-12:
+            raise ValueError("Macierz ma zerowy wyznacznik")
+        np_mat = np.array(self.__matrix)
+        inv = np.linalg.inv(np_mat)
+        return Matrix(inv.tolist())
+
+    def is_it_ok_to_multiply(self, matrix2) -> bool:
+        row1, col1 = self.size()
+        row2, col2 = matrix2.size()
+        return col1 == row2
 
     @staticmethod
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
 
-    def size(self) -> tuple[int, int]:
-        rows = len(self.__matrix)
-        cols = len(self.__matrix[0]) if rows > 0 else 0
-        return rows, cols
-
-    def is_symmetric(self, tol: float = 1e-9) -> bool:
-        rows, cols = self.size()
-
-        if rows != cols:
-            return False
-
-        for i in range(rows):
-            for j in range(i + 1, cols):
-                if abs(self.__matrix[i][j] - self.__matrix[j][i]) > tol:
-                    return False
-
-        return True
