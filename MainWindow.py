@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
+        #Fields
         self.rows1 = 3
         self.rows2 = 3
         self.cols1 = 3
@@ -20,7 +21,6 @@ class MainWindow(QMainWindow):
         self.add_inputs1 = []
         self.add_inputs2 = []
         self.add_result = []
-
 
         #Toolbar
         toolbar = QToolBar("Toolbar")
@@ -76,11 +76,14 @@ class MainWindow(QMainWindow):
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
-        self.resize(1280, 720)
+        self.resize(1024, 576)
         self.setWindowIcon(QIcon("icons/icon.png"))
+
 
     def __gen_add_view(self) -> QWidget:
         add_view = QWidget()
+        add_view.setContentsMargins(25, 25, 25, 25)
+
         v_layout = QVBoxLayout(add_view)
         add_view.setLayout(v_layout)
 
@@ -96,7 +99,7 @@ class MainWindow(QMainWindow):
 
         rows_input = QSpinBox()
         rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        rows_input.setFixedSize(75, 75)
+        rows_input.setFixedSize(75, 25)
         rows_input.lineEdit().setReadOnly(True)
         rows_input.setRange(1, 5)
         rows_input.setValue(self.rows1)
@@ -109,13 +112,16 @@ class MainWindow(QMainWindow):
 
         cols_input = QSpinBox()
         cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        cols_input.setFixedSize(75, 75)
+        cols_input.setFixedSize(75, 25)
         cols_input.lineEdit().setReadOnly(True)
         cols_input.setRange(1, 5)
         cols_input.setValue(self.cols1)
+
         h_layout.addWidget(cols_input)
 
-        v_layout.addWidget(header, 1)
+        rows_input.valueChanged.connect(lambda: self.on_matrix_size_change(0, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.on_matrix_size_change(0, rows_input.value(), cols_input.value()))
+        v_layout.addWidget(header)
 
         main_area = QWidget()
         h_layout = QHBoxLayout(header)
@@ -128,7 +134,7 @@ class MainWindow(QMainWindow):
         plus_label = QLabel("+")
         plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         plus_label.setFont(QFont("Courier New", 30))
-        h_layout.addWidget(plus_label, 1)
+        h_layout.addWidget(plus_label)
 
         add_input2 = self.generate_input_grid(self.rows1, self.cols1, self.add_inputs2)
         h_layout.addWidget(add_input2, 5)
@@ -136,7 +142,7 @@ class MainWindow(QMainWindow):
         eq_label = QLabel("=")
         eq_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         eq_label.setFont(QFont("Courier New", 30))
-        h_layout.addWidget(eq_label, 1)
+        h_layout.addWidget(eq_label)
 
         add_result = self.generate_input_grid(self.rows1, self.cols1, self.add_result, True)
         h_layout.addWidget(add_result, 5)
@@ -144,11 +150,34 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(main_area, 5)
 
         add_button = QPushButton("Add")
+        add_button.setFixedSize(250, 50)
+        add_button.setFont(QFont("Courier New", 25))
+        add_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        v_layout.addWidget(add_button)
+        v_layout.addWidget(add_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
         return add_view
 
+
+    def on_matrix_size_change(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
+        self.rows1 = rows1
+        self.cols1 = cols1
+        if rows2 is not None:
+            self.rows2 = rows2
+        if cols2 is not None:
+            self.cols2 = cols2
+
+        old_widget = self.stack.widget(view_index)
+        self.stack.removeWidget(old_widget)
+        old_widget.deleteLater()
+
+        match view_index:
+            case 0:
+                self.stack.insertWidget(view_index, self.__gen_add_view())
+            case _:
+                pass
+
+        self.stack.setCurrentIndex(view_index)
 
     @staticmethod
     def generate_input_grid(rows: int, cols: int, inputs_container = None, read_only = False) -> QWidget:
@@ -156,6 +185,8 @@ class MainWindow(QMainWindow):
             inputs_container = []
         input_widget = QWidget()
         grid = QGridLayout(input_widget)
+        grid.setHorizontalSpacing(5)
+        grid.setVerticalSpacing(5)
         input_widget.setLayout(grid)
 
         for row in range(rows):
@@ -163,12 +194,13 @@ class MainWindow(QMainWindow):
             for col in range(cols):
                 m_input = QDoubleSpinBox()
                 m_input.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
-                m_input.setFixedSize(75, 25)
+                m_input.setFixedSize(65, 25)
                 m_input.setSingleStep(0.1)
                 m_input.setDecimals(4)
                 m_input.setRange(-9999, 9999)
                 m_input.setValue(0.0)
                 m_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
                 if read_only:
                     m_input.setReadOnly(True)
                 row_input.append(m_input)
@@ -176,9 +208,10 @@ class MainWindow(QMainWindow):
             inputs_container.append(row_input)
         return input_widget
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
 
