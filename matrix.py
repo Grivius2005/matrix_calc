@@ -8,6 +8,17 @@ class PowMethod(Enum):
     MULTIPLY = "MULTIPLY"
     JORDAN = "JORDAN"
 
+class OpType(Enum):
+    ADD = 1
+    SUB = 2
+    MUL = 3
+    POW = 4
+    INV = 5
+    TRANS = 6
+class MatrixOperation:
+    def __init__(self, op_type: OpType):
+        self.op_type: OpType = op_type
+
 class Matrix:
     def __init__(self, _matrix: list[list[float]] = None, rows: int = None, cols: int = None):
         if _matrix is not None:
@@ -103,14 +114,14 @@ class Matrix:
     #brak metody determinant
 
     def trace(self) -> float:
-        rows, cols = self.size()    #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        rows, cols = self.size()
         if rows != cols:
             raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
         return sum(self.__matrix[i][i] for i in range(rows))
 
     def rank(self) -> int:
         mat = copy.deepcopy(self.__matrix)
-        rows, cols = self.size() #metoda size jest jeszcze do stworzenia prawdopodobnie przez Rolanda
+        rows, cols = self.size()
         r = 0
         for c in range(cols):
             if r >= rows:
@@ -136,9 +147,8 @@ class Matrix:
     def cofactor(self) -> "Matrix":
         rows, cols = self.size()
         if rows != cols:
-            raise ValueError("Macierz dopełnień istnieje tylko dla macierzy kwadratowych.")
+            return False
 
-        cofactor_data = []
         for i in range(rows):
             cofactor_row = []
             for j in range(cols):
