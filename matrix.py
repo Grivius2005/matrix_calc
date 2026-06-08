@@ -119,39 +119,39 @@ class Matrix:
     def determinant(self) -> float:
         rows, cols = self.size()
 
-    if rows != cols:
-        raise ValueError("Wyznacznik jest zdefiniowany tylko dla macierzy kwadratowych.")
+        if rows != cols:
+            raise ValueError("Wyznacznik jest zdefiniowany tylko dla macierzy kwadratowych.")
 
-    if rows == 0:
-        raise ValueError("Nie można obliczyć wyznacznika pustej macierzy.")
+        if rows == 0:
+            raise ValueError("Nie można obliczyć wyznacznika pustej macierzy.")
 
-    mat = copy.deepcopy(self.__matrix)
-    det = 1.0
+        mat = copy.deepcopy(self.__matrix)
+        det = 1.0
 
-    for i in range(rows):
-        pivot = i
+        for i in range(rows):
+            pivot = i
 
-        for r in range(i + 1, rows):
-            if abs(mat[r][i]) > abs(mat[pivot][i]):
-                pivot = r
+            for r in range(i + 1, rows):
+                if abs(mat[r][i]) > abs(mat[pivot][i]):
+                    pivot = r
 
-        if abs(mat[pivot][i]) < 1e-12:
-            return 0.0
+            if abs(mat[pivot][i]) < 1e-12:
+                return 0.0
 
-        if pivot != i:
-            mat[i], mat[pivot] = mat[pivot], mat[i]
-            det *= -1
+            if pivot != i:
+                mat[i], mat[pivot] = mat[pivot], mat[i]
+                det *= -1
 
-        pivot_value = mat[i][i]
-        det *= pivot_value
+            pivot_value = mat[i][i]
+            det *= pivot_value
 
-        for r in range(i + 1, rows):
-            factor = mat[r][i] / pivot_value
+            for r in range(i + 1, rows):
+                factor = mat[r][i] / pivot_value
 
-            for c in range(i + 1, cols):
-                mat[r][c] -= factor * mat[i][c]
+                for c in range(i + 1, cols):
+                    mat[r][c] -= factor * mat[i][c]
 
-    return det
+        return det
 
     def trace(self) -> float:
         rows, cols = self.size()
