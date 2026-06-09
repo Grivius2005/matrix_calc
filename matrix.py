@@ -208,6 +208,22 @@ class Matrix:
         # wynik zwracany jako obiekt klasy Matrix
         return Matrix(inv.tolist())
 
+    def jordan(self) -> tuple[Matrix, Matrix, Matrix]:
+        from sympy import Matrix as SymMatrix
+
+        sym_mat = SymMatrix(self.__matrix)
+        p_sym, j_sym = sym_mat.jordan_form()
+        p_inv_sym = p_sym.inv()
+
+        def to_float_list(s_mat):
+            return [[float(complex(val).real) for val in row] for row in s_mat.tolist()]
+
+        p = Matrix(_matrix = to_float_list(p_sym))
+        j = Matrix(_matrix =to_float_list(j_sym))
+        p_inv = Matrix(_matrix=to_float_list(p_inv_sym))
+
+        return p, j, p_inv
+
     @staticmethod
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
