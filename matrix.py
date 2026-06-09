@@ -35,7 +35,9 @@ class Matrix:
     def data(self) -> list[list[float]]:
         return self.__matrix
 
-    # brak __eq__ do stworzenia???
+    def __eq__(self, other):
+        #sprawdza czy przechowywane tablice są równe
+        return self.data == orher.data
 
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
