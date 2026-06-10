@@ -32,6 +32,7 @@ if __name__ == '__main__':
                    [2, 4, 6, 7],
                    [1, 0, 0, 0]])
 
+    #trace()
     try:
         print(mat1.trace())
     except ValueError as e:
@@ -58,5 +59,35 @@ if __name__ == '__main__':
         print(e)
     try:
         print(mat7.trace())
+    except ValueError as e:
+        print(e)
+
+    #determinant()
+    try:
+        print(mat1.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat2.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat3.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat4.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat5.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat6.determinant())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat7.determinant())
     except ValueError as e:
         print(e)
