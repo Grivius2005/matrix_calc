@@ -1,9 +1,8 @@
 # klasa  Matrix :)
+from __future__ import annotations
 from typing import Union
-import numpy as np
-from sympy import Matrix as SymMatrix
+import json
 import copy
-from enum import Enum
 
 
 class Matrix:
