@@ -121,3 +121,12 @@ if __name__ == '__main__':
         print_matrix(mat7.cofactor())
     except ValueError as e:
         print(e)
+
+    #transpose
+    print_matrix(mat1.transpose())
+    print_matrix(mat2.transpose())
+    print_matrix(mat3.transpose())
+    print_matrix(mat4.transpose())
+    print_matrix(mat5.transpose())
+    print_matrix(mat6.transpose())
+    print_matrix(mat7.transpose())
