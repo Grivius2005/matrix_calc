@@ -88,33 +88,19 @@ class Matrix:
             # zwrocony wynik przekonwertowany z powrotem na obiekt klasy Matrix
             return Matrix(_matrix=result.tolist())
 
-    def __pow__(self, n: int, method=PowMethod.MULTIPLY) -> "Matrix":
-        row, col = self.size()
-        if row != col:
-            raise ValueError("Niezgodne wymiary macierzy")
+    def __pow__(self, k: int) -> Matrix:
+        rows, cols = self.size()
+        if rows != cols:
+            raise ValueError("Potęgowanie jest możliwe tylko dla macierzy kwadratowych.")
+        if k < 0:
+            raise ValueError("Obsługiwane są tylko nieujemne potęgi.")
 
-        if n < 0:
-            inverse_mat = self.inverse()
-            return inverse_mat.__pow__(-n, method)
+        result = Matrix(rows=rows, cols=cols)
+        base = Matrix(data=self.__matrix)
 
-        if method == PowMethod.MULTIPLY:
-            result = Matrix(rows=row, cols=col)
-            for k in range(n):
-                result = result * self
-            return result
-
-        if method == PowMethod.JORDAN:
-            j_mat, pinv_mat = jordan(self)  # co z jordanem????
-
-            sym_j = SymMatrix(j_mat._Matrix__matrix)
-
-            sym_j_pow = sym_j ** n
-
-            j_pow = Matrix(sym_j_pow.tolist())
-
-            p_mat = pinv_mat ** (-1)
-
-            return p_mat * j_pow * pinv_mat
+        for _ in range(k):
+            result = result * base
+        return result
 
     def size(self) -> tuple[int, int]:
         rows = len(self.__matrix)
