@@ -5,7 +5,7 @@ from memory import Memory
 def print_matrix(m):
     for row in m.data:
         for value in row:
-            print(value, end="  ")
+            print(f'{value:.1f}', end="  ")
         print("")
     print("")
 
@@ -89,5 +89,35 @@ if __name__ == '__main__':
         print(e)
     try:
         print(mat7.determinant())
+    except ValueError as e:
+        print(e)
+
+    #cofactor()
+    try:
+        print_matrix(mat1.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat2.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat3.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat4.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat5.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat6.cofactor())
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat7.cofactor())
     except ValueError as e:
         print(e)
