@@ -33,7 +33,7 @@ class Matrix:
 
     def __eq__(self, other):
         #sprawdza czy przechowywane tablice są równe
-        return self.data == orher.data
+        return self.data == other.data
 
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
