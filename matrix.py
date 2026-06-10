@@ -1,4 +1,4 @@
-#klasa  Matrix :)
+# klasa  Matrix :)
 from typing import Union
 import numpy as np
 from sympy import Matrix as SymMatrix
@@ -31,7 +31,9 @@ class Matrix:
     def data(self) -> list[list[float]]:
         return self.__matrix
 
-    #brak __eq__ do stworzenia???
+    def __eq__(self, other):
+        #sprawdza czy przechowywane tablice są równe
+        return self.data == orher.data
 
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
@@ -53,6 +55,12 @@ class Matrix:
         ]
         return Matrix(result_data)
 
+    def is_it_ok_to_multiply(self, matrix2) -> bool:
+        row1, col1 = self.size()
+        row2, col2 = matrix2.size()
+        # warunek mnorzenia Macierzy
+        return col1 == row2
+
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
         # Mnożenie przez skalar
         if isinstance(other, (float, int)):
@@ -64,14 +72,19 @@ class Matrix:
             return Matrix(result_data)
         elif isinstance(other, Matrix):
             # Mnożenie przez macierz
-            if self.is_it_ok_to_multiply(other):
-                result = np.array(self.__matrix) @ np.array(other.__matrix)
-                return Matrix(_matrix = result.tolist())
-            else:
+            if not self.is_it_ok_to_multiply(other):
                 raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
+            # zamiana na obiekty biblioteki numpy
+            mat1_np = np.array(self.__matrix)
+            mat2_np = np.array(other.__matrix)
+            # wykorzystanie funkcji mnozenia macierzy z biblioteki numpy
+            result = mat1_np @ mat2_np
+            # zwrocony wynik przekonwertowany z powrotem na obiekt klasy Matrix
+            return Matrix(_matrix=result.tolist())
 
-    def __pow__(self, n: int, method = PowMethod.MULTIPLY) -> "Matrix":
-        if len(self.__matrix[0]) != len(self.__matrix):
+    def __pow__(self, n: int, method=PowMethod.MULTIPLY) -> "Matrix":
+        row, col = self.size()
+        if row != col:
             raise ValueError("Niezgodne wymiary macierzy")
 
         if n < 0:
@@ -79,13 +92,13 @@ class Matrix:
             return inverse_mat.__pow__(-n, method)
 
         if method == PowMethod.MULTIPLY:
-            result = Matrix(rows=len(self.__matrix), cols=len(self.__matrix))
+            result = Matrix(rows=row, cols=col)
             for k in range(n):
                 result = result * self
             return result
 
         if method == PowMethod.JORDAN:
-            j_mat, pinv_mat = jordan(self) #co z jordanem????
+            j_mat, pinv_mat = jordan(self)  # co z jordanem????
 
             sym_j = SymMatrix(j_mat._Matrix__matrix)
 
@@ -102,47 +115,41 @@ class Matrix:
         cols = len(self.__matrix[0]) if rows > 0 else 0
         return rows, cols
 
+    def _calc_det(self, matrix_data: list[list[float]]) -> float:
+        mat = copy.deepcopy(matrix_data)
+        n = len(mat)
+
+        det = 1.0
+        for i in range(n):
+            if mat[i][i] == 0:
+                for j in range(i + 1, n):
+                    if mat[j][i] != 0:
+                        mat[i], mat[j] = mat[j], mat[i]
+                        det *= -1.0
+                        break
+                else:
+                    return 0.0
+
+            det *= mat[i][i]
+            for j in range(i + 1, n):
+                factor = mat[j][i] / mat[i][i]
+                for k in range(i, n):
+                    mat[j][k] -= factor * mat[i][k]
+        return det
+
     def determinant(self) -> float:
+        """Oblicza wyznacznik jednym domyślnym sposobem (Eliminacja Gaussa)."""
         rows, cols = self.size()
-
-    if rows != cols:
-        raise ValueError("Wyznacznik jest zdefiniowany tylko dla macierzy kwadratowych.")
-
-    if rows == 0:
-        raise ValueError("Nie można obliczyć wyznacznika pustej macierzy.")
-
-    mat = copy.deepcopy(self.__matrix)
-    det = 1.0
-
-    for i in range(rows):
-        pivot = i
-
-        for r in range(i + 1, rows):
-            if abs(mat[r][i]) > abs(mat[pivot][i]):
-                pivot = r
-
-        if abs(mat[pivot][i]) < 1e-12:
-            return 0.0
-
-        if pivot != i:
-            mat[i], mat[pivot] = mat[pivot], mat[i]
-            det *= -1
-
-        pivot_value = mat[i][i]
-        det *= pivot_value
-
-        for r in range(i + 1, rows):
-            factor = mat[r][i] / pivot_value
-
-            for c in range(i + 1, cols):
-                mat[r][c] -= factor * mat[i][c]
-
-    return det
+        if rows != cols or rows == 0:
+            raise ValueError("Wyznacznik można obliczyć tylko dla niepustych macierzy kwadratowych.")
+        return self._calc_det(self.__matrix)
 
     def trace(self) -> float:
         rows, cols = self.size()
+        # sprawdzenie czy macierz jest kwadratowa
         if rows != cols:
             raise ValueError("Ślad jest definiowany tylko dla macierzy kwadratowych.")
+        # zwraca sumę elementów na głównej przekątnej
         return sum(self.__matrix[i][i] for i in range(rows))
 
     def rank(self) -> int:
@@ -180,26 +187,43 @@ class Matrix:
             cofactor_row = []
             for j in range(cols):
                 minor = [r[:j] + r[j + 1:] for idx, r in enumerate(self.__matrix) if idx != i]
-                minor_det = self.determinant(minor) if minor else 1.0 #brak metody determinant
+                minor_det = self._calc_det(minor) if minor else 1.0  # brak metody determinant
                 cofactor_row.append(((-1) ** (i + j)) * minor_det)
             cofactor_data.append(cofactor_row)
         return Matrix(cofactor_data)
 
     def inverse(self):
-        if len(self.__matrix[0]) != len(self.__matrix):
+        rows, cols = self.size()
+        # sprawdzenmie czy macierz jest kwadratowa
+        if rows != cols:
             raise ValueError("Niezgodne wymiary macierzy")
-        if abs(self.determinant()) < 1e-12:
+        # sprawdzenie czy wyznacznik nie jest  0
+        if abs(self.determinant()) < 1e-12:  # brak metody determinant
             raise ValueError("Macierz ma zerowy wyznacznik")
+        # konwersja na np.array i obliczenie odwrotności
         np_mat = np.array(self.__matrix)
         inv = np.linalg.inv(np_mat)
+        # wynik zwracany jako obiekt klasy Matrix
         return Matrix(inv.tolist())
 
-    def is_it_ok_to_multiply(self, matrix2) -> bool:
-        row1, col1 = self.size()
-        row2, col2 = matrix2.size()
-        return col1 == row2
+    def jordan(self) -> tuple[Matrix, Matrix, Matrix]:
+        from sympy import Matrix as SymMatrix
+
+        sym_mat = SymMatrix(self.__matrix)
+        p_sym, j_sym = sym_mat.jordan_form()
+        p_inv_sym = p_sym.inv()
+
+        def to_float_list(s_mat):
+            return [[float(complex(val).real) for val in row] for row in s_mat.tolist()]
+
+        p = Matrix(_matrix = to_float_list(p_sym))
+        j = Matrix(_matrix =to_float_list(j_sym))
+        p_inv = Matrix(_matrix=to_float_list(p_inv_sym))
+
+        return p, j, p_inv
 
     @staticmethod
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
+
 
