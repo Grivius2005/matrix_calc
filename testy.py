@@ -33,6 +33,7 @@ if __name__ == '__main__':
                    [1, 0, 0, 0]])
 
     #trace()
+    print("\ntrace:")
     try:
         print(mat1.trace())
     except ValueError as e:
@@ -63,6 +64,7 @@ if __name__ == '__main__':
         print(e)
 
     #determinant()
+    print("\ndeterminant()")
     try:
         print(mat1.determinant())
     except ValueError as e:
@@ -93,6 +95,7 @@ if __name__ == '__main__':
         print(e)
 
     #cofactor()
+    print("\ncofactor()")
     try:
         print_matrix(mat1.cofactor())
     except ValueError as e:
@@ -123,6 +126,7 @@ if __name__ == '__main__':
         print(e)
 
     #transpose
+    print("\ntranspose()")
     print_matrix(mat1.transpose())
     print_matrix(mat2.transpose())
     print_matrix(mat3.transpose())
@@ -130,3 +134,34 @@ if __name__ == '__main__':
     print_matrix(mat5.transpose())
     print_matrix(mat6.transpose())
     print_matrix(mat7.transpose())
+
+    #potęgowanie
+    print("\n__pow__()")
+    try:
+        print_matrix(mat1**2)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat2**3)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat3**4)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat4**2)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat5 ** 2)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat6**2)
+    except ValueError as e:
+        print(e)
+    try:
+        print_matrix(mat7 ** 2)
+    except ValueError as e:
+        print(e)
