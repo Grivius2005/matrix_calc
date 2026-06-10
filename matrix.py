@@ -6,10 +6,6 @@ import copy
 from enum import Enum
 
 
-class PowMethod(Enum):
-    MULTIPLY = "MULTIPLY"
-    JORDAN = "JORDAN"
-
 class Matrix:
     def __init__(self, _matrix: list[list[float]] = None, rows: int = None, cols: int = None):
         if _matrix is not None:
