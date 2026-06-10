@@ -31,9 +31,11 @@ class Matrix:
     def data(self) -> list[list[float]]:
         return self.__matrix
 
+
     def __eq__(self, other):
         #sprawdza czy przechowywane tablice są równe
         return self.data == other.data
+
 
     def __add__(self, matrix2: Matrix) -> Matrix:
         if not Matrix.have_same_size(self, matrix2):
@@ -143,6 +145,33 @@ class Matrix:
         if rows != cols or rows == 0:
             raise ValueError("Wyznacznik można obliczyć tylko dla niepustych macierzy kwadratowych.")
         return self._calc_det(self.__matrix)
+
+    def _calc_det(self, matrix_data: list[list[float]]) -> float:
+        """Prywatna funkcja pomocnicza wykorzystująca eliminację Gaussa."""
+        mat = copy.deepcopy(matrix_data)
+        n = len(mat)
+
+        # Szybki przypadek dla minora 1x1
+        if n == 1:
+            return mat[0][0]
+
+        det = 1.0
+        for i in range(n):
+            if mat[i][i] == 0:
+                for j in range(i+1, n):
+                    if mat[j][i] != 0:
+                        mat[i], mat[j] = mat[j], mat[i]
+                        det *= -1.0
+                        break
+                else:
+                    return 0.0
+
+            det *= mat[i][i]
+            for j in range(i+1, n):
+                factor = mat[j][i] / mat[i][i]
+                for k in range(i, n):
+                    mat[j][k] -= factor * mat[i][k]
+        return det
 
     def trace(self) -> float:
         rows, cols = self.size()
