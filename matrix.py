@@ -31,9 +31,14 @@ class Matrix:
         return self.__matrix
 
 
-    def __eq__(self, other):
-        #sprawdza czy przechowywane tablice są równe
-        return self.data == other.data
+    def __eq__(self, matrix2: Matrix) -> bool:
+        if not Matrix.have_same_size(self, matrix2):
+            return False
+        for i in range(len(self.__matrix)):
+            for j in range(len(self.__matrix[0])):
+                if abs(self.__matrix[i][j] - matrix2.data[i][j]) > 1e-9:
+                    return False
+        return True
 
 
     def __add__(self, matrix2: Matrix) -> Matrix:
