@@ -67,9 +67,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
-        add_view_option.triggered.connect(lambda: self.change_refresh_view(0, self.rows1, self.cols1, self.rows2, self.cols2))
-        subtract_view_option.triggered.connect(lambda: self.change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
-        timesk_view_option.triggered.connect(lambda: self.change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
+        add_view_option.triggered.connect(lambda: self.__change_refresh_view(0, self.rows1, self.cols1, self.rows2, self.cols2))
+        subtract_view_option.triggered.connect(lambda: self.__change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
+        timesk_view_option.triggered.connect(lambda: self.__change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -116,8 +116,8 @@ class MainWindow(QMainWindow):
 
         h_layout.addWidget(cols_input)
 
-        rows_input.valueChanged.connect(lambda: self.change_refresh_view(0, rows_input.value(), cols_input.value()))
-        cols_input.valueChanged.connect(lambda: self.change_refresh_view(0, rows_input.value(), cols_input.value()))
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(0, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(0, rows_input.value(), cols_input.value()))
         v_layout.addWidget(header)
 
         main_area = QWidget()
@@ -194,8 +194,8 @@ class MainWindow(QMainWindow):
 
         h_layout.addWidget(cols_input)
 
-        rows_input.valueChanged.connect(lambda: self.change_refresh_view(1, rows_input.value(), cols_input.value()))
-        cols_input.valueChanged.connect(lambda: self.change_refresh_view(1, rows_input.value(), cols_input.value()))
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(1, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(1, rows_input.value(), cols_input.value()))
         v_layout.addWidget(header)
 
         main_area = QWidget()
@@ -234,7 +234,10 @@ class MainWindow(QMainWindow):
         return subtract_view
 
 
-    def change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
+
+
+
+    def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
         self.cols1 = cols1
         if rows2 is not None:
