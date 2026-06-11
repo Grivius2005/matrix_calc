@@ -34,6 +34,9 @@ class MainWindow(QMainWindow):
         self.timem_inputs2 = []
         self.timem_result = []
 
+        self.transpose_inputs = []
+        self.transpose_result = []
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -74,6 +77,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_subtract_view())
         self.stack.addWidget(self.__gen_times_view())
         self.stack.addWidget(self.__gen_timem_view())
+        self.stack.addWidget(self.__gen_transpose_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -81,6 +85,7 @@ class MainWindow(QMainWindow):
         subtract_view_option.triggered.connect(lambda: self.__change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
         timesk_view_option.triggered.connect(lambda: self.__change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
         timesm_view_option.triggered.connect(lambda: self.__change_refresh_view(3, self.rows1, self.cols1, self.rows2, self.cols2))
+        transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -161,6 +166,7 @@ class MainWindow(QMainWindow):
         add_button.setFixedSize(250, 50)
         add_button.setFont(QFont("Courier New", 25))
         add_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        add_button.clicked.connect(lambda: print(self.add_result))
 
         v_layout.addWidget(add_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
@@ -230,8 +236,8 @@ class MainWindow(QMainWindow):
         eq_label.setFont(QFont("Courier New", 30))
         h_layout.addWidget(eq_label)
 
-        add_result = self.generate_input_grid(self.rows1, self.cols1, self.add_result, True)
-        h_layout.addWidget(add_result, 5)
+        subtract_result = self.generate_input_grid(self.rows1, self.cols1, self.subtract_result, True)
+        h_layout.addWidget(subtract_result, 5)
 
         v_layout.addWidget(main_area, 5)
 
@@ -239,6 +245,7 @@ class MainWindow(QMainWindow):
         subtract_button.setFixedSize(250, 50)
         subtract_button.setFont(QFont("Courier New", 25))
         subtract_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        subtract_button.clicked.connect(lambda: print(self.subtract_result))
 
         v_layout.addWidget(subtract_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
@@ -329,12 +336,15 @@ class MainWindow(QMainWindow):
         times_button.setFixedSize(250, 50)
         times_button.setFont(QFont("Courier New", 25))
         times_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        times_button.clicked.connect(lambda: print(self.times_result))
 
         v_layout.addWidget(times_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
         return times_view
 
-    def __gen_timem_view(self):
+    def __gen_timem_view(self) -> QWidget:
+        self.cols1 = self.rows2
+
         timem_view = QWidget()
         timem_view.setContentsMargins(25, 25, 25, 25)
 
@@ -383,7 +393,7 @@ class MainWindow(QMainWindow):
         rows2_input.setFixedSize(75, 25)
         rows2_input.lineEdit().setReadOnly(True)
         rows2_input.setRange(1, 5)
-        rows2_input.setValue(self.cols1)
+        rows2_input.setValue(self.rows2)
         h_layout.addWidget(rows2_input)
 
         x_label = QLabel("X")
@@ -436,14 +446,87 @@ class MainWindow(QMainWindow):
 
         v_layout.addWidget(main_area, 5)
 
-        times_button = QPushButton("Multiply")
-        times_button.setFixedSize(250, 50)
-        times_button.setFont(QFont("Courier New", 25))
-        times_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        timem_button = QPushButton("Multiply")
+        timem_button.setFixedSize(250, 50)
+        timem_button.setFont(QFont("Courier New", 25))
+        timem_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        timem_button.clicked.connect(lambda: print(self.timem_result))
 
-        v_layout.addWidget(times_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        v_layout.addWidget(timem_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return timem_view
+
+    def __gen_transpose_view(self) -> QWidget:
+        transpose_view = QWidget()
+        transpose_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(transpose_view)
+        transpose_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(4, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(4, rows_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        transpose_inputs = self.generate_input_grid(self.rows1, self.cols1, self.transpose_inputs)
+        h_layout.addWidget(transpose_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label)
+
+        transpose_result = self.generate_input_grid(self.cols1, self.rows1, self.transpose_result)
+        h_layout.addWidget(transpose_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        transpose_button = QPushButton("Transpose")
+        transpose_button.setFixedSize(250, 50)
+        transpose_button.setFont(QFont("Courier New", 25))
+        transpose_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        transpose_button.clicked.connect(lambda: print(self.transpose_result))
+
+        v_layout.addWidget(transpose_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return transpose_view
 
         
 
@@ -456,8 +539,9 @@ class MainWindow(QMainWindow):
             self.cols2 = cols2
 
         old_widget = self.stack.widget(view_index)
-        self.stack.removeWidget(old_widget)
-        old_widget.deleteLater()
+        if old_widget is not None:
+            self.stack.removeWidget(old_widget)
+            old_widget.deleteLater()
 
         match view_index:
             case 0:
@@ -468,15 +552,19 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_times_view())
             case 3:
                 self.stack.insertWidget(view_index, self.__gen_timem_view())
+            case 4:
+                self.stack.insertWidget(view_index, self.__gen_transpose_view())
             case _:
                 pass
 
         self.stack.setCurrentIndex(view_index)
 
+
     @staticmethod
-    def generate_input_grid(rows: int, cols: int, inputs_container = None, read_only = False) -> QWidget:
+    def generate_input_grid(rows: int, cols: int, inputs_container: list|None = None, read_only = False) -> QWidget:
         if inputs_container is None:
             inputs_container = []
+        inputs_container.clear()
         input_widget = QWidget()
         grid = QGridLayout(input_widget)
         grid.setHorizontalSpacing(5)
