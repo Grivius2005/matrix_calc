@@ -161,6 +161,7 @@ class MainWindow(QMainWindow):
         add_button.setFixedSize(250, 50)
         add_button.setFont(QFont("Courier New", 25))
         add_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        add_button.clicked.connect(lambda: print(self.add_result))
 
         v_layout.addWidget(add_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
@@ -239,6 +240,7 @@ class MainWindow(QMainWindow):
         subtract_button.setFixedSize(250, 50)
         subtract_button.setFont(QFont("Courier New", 25))
         subtract_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        subtract_button.clicked.connect(lambda: print(self.subtract_result))
 
         v_layout.addWidget(subtract_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
@@ -329,12 +331,13 @@ class MainWindow(QMainWindow):
         times_button.setFixedSize(250, 50)
         times_button.setFont(QFont("Courier New", 25))
         times_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        times_button.clicked.connect(lambda: print(self.times_result))
 
         v_layout.addWidget(times_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
         return times_view
 
-    def __gen_timem_view(self):
+    def __gen_timem_view(self) -> QWidget:
         timem_view = QWidget()
         timem_view.setContentsMargins(25, 25, 25, 25)
 
@@ -436,12 +439,13 @@ class MainWindow(QMainWindow):
 
         v_layout.addWidget(main_area, 5)
 
-        times_button = QPushButton("Multiply")
-        times_button.setFixedSize(250, 50)
-        times_button.setFont(QFont("Courier New", 25))
-        times_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        timem_button = QPushButton("Multiply")
+        timem_button.setFixedSize(250, 50)
+        timem_button.setFont(QFont("Courier New", 25))
+        timem_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        timem_button.clicked.connect(lambda: print(self.timem_result))
 
-        v_layout.addWidget(times_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        v_layout.addWidget(timem_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return timem_view
 
@@ -456,8 +460,9 @@ class MainWindow(QMainWindow):
             self.cols2 = cols2
 
         old_widget = self.stack.widget(view_index)
-        self.stack.removeWidget(old_widget)
-        old_widget.deleteLater()
+        if old_widget is not None:
+            self.stack.removeWidget(old_widget)
+            old_widget.deleteLater()
 
         match view_index:
             case 0:
