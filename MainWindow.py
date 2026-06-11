@@ -40,6 +40,9 @@ class MainWindow(QMainWindow):
         self.det_inputs = []
         self.det_result = None
 
+        self.reverse_inputs = []
+        self.reverse_result = []
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -84,6 +87,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_timem_view())
         self.stack.addWidget(self.__gen_transpose_view())
         self.stack.addWidget(self.__gen_det_view())
+        self.stack.addWidget(self.__gen_reverse_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -93,6 +97,7 @@ class MainWindow(QMainWindow):
         timesm_view_option.triggered.connect(lambda: self.__change_refresh_view(3, self.rows1, self.cols1, self.rows2, self.cols2))
         transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
         det_view_option.triggered.connect(lambda: self.__change_refresh_view(5, self.rows1, self.cols1, self.rows2, self.cols2))
+        reverse_view_option.triggered.connect(lambda: self.__change_refresh_view(6, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -617,6 +622,80 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(det_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return det_view
+    
+    def __gen_reverse_view(self) -> QWidget:
+        self.cols1 = self.rows1
+
+        reverse_view = QWidget()
+        reverse_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(reverse_view)
+        reverse_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(6, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(6, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        reverse_inputs = self.generate_input_grid(self.rows1, self.cols1, self.reverse_inputs)
+        h_layout.addWidget(reverse_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label)
+
+        reverse_result = self.generate_input_grid(self.rows1, self.cols1, self.reverse_result)
+        h_layout.addWidget(reverse_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        reverse_button = QPushButton("Reverse")
+        reverse_button.setFixedSize(250, 50)
+        reverse_button.setFont(QFont("Courier New", 25))
+        reverse_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        reverse_button.clicked.connect(lambda: print(self.reverse_result))
+
+        v_layout.addWidget(reverse_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return reverse_view
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
@@ -644,6 +723,8 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_transpose_view())
             case 5:
                 self.stack.insertWidget(view_index, self.__gen_det_view())
+            case 6:
+                self.stack.insertWidget(view_index, self.__gen_reverse_view())
             case _:
                 pass
 
