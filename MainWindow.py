@@ -37,6 +37,9 @@ class MainWindow(QMainWindow):
         self.transpose_inputs = []
         self.transpose_result = []
 
+        self.det_inputs = []
+        self.det_result = None
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -46,10 +49,11 @@ class MainWindow(QMainWindow):
         subtract_view_option = QAction("-", self)
         timesk_view_option = QAction("s*", self)
         timesm_view_option = QAction("M*", self)
-        transpose_view_option = QAction("Tr", self)
+        transpose_view_option = QAction("T", self)
+        det_view_option = QAction("|m|", self)
         reverse_view_option = QAction("^-1", self)
         power_view_option = QAction("^s", self)
-        trace_view_option = QAction("Tc", self)
+        trace_view_option = QAction("Tr", self)
         cofactor_view_option = QAction("Co", self)
         unit_view_option = QAction("I", self)
 
@@ -58,6 +62,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(timesk_view_option)
         toolbar.addAction(timesm_view_option)
         toolbar.addAction(transpose_view_option)
+        toolbar.addAction(det_view_option)
         toolbar.addAction(reverse_view_option)
         toolbar.addAction(power_view_option)
         toolbar.addAction(trace_view_option)
@@ -78,6 +83,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_times_view())
         self.stack.addWidget(self.__gen_timem_view())
         self.stack.addWidget(self.__gen_transpose_view())
+        self.stack.addWidget(self.__gen_det_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -86,6 +92,7 @@ class MainWindow(QMainWindow):
         timesk_view_option.triggered.connect(lambda: self.__change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
         timesm_view_option.triggered.connect(lambda: self.__change_refresh_view(3, self.rows1, self.cols1, self.rows2, self.cols2))
         transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
+        det_view_option.triggered.connect(lambda: self.__change_refresh_view(5, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -528,7 +535,88 @@ class MainWindow(QMainWindow):
 
         return transpose_view
 
-        
+    def __gen_det_view(self) -> QWidget:
+        self.cols1 = self.rows1
+
+        det_view = QWidget()
+        det_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(det_view)
+        det_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(5, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(5, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        det_inputs = self.generate_input_grid(self.rows1, self.cols1, self.det_inputs)
+        h_layout.addWidget(det_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label, 5)
+
+        det_result = QDoubleSpinBox()
+        det_result.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+        det_result.setFixedSize(65, 25)
+        det_result.setSingleStep(0.1)
+        det_result.setDecimals(4)
+        det_result.setRange(-9999, 9999)
+        det_result.setValue(0.0)
+        det_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.det_result = det_result
+
+        h_layout.addWidget(det_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        det_button = QPushButton("Determinant")
+        det_button.setFixedSize(250, 50)
+        det_button.setFont(QFont("Courier New", 25))
+        det_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        det_button.clicked.connect(lambda: print(self.det_result))
+
+        v_layout.addWidget(det_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return det_view
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
@@ -554,11 +642,12 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_timem_view())
             case 4:
                 self.stack.insertWidget(view_index, self.__gen_transpose_view())
+            case 5:
+                self.stack.insertWidget(view_index, self.__gen_det_view())
             case _:
                 pass
 
         self.stack.setCurrentIndex(view_index)
-
 
     @staticmethod
     def generate_input_grid(rows: int, cols: int, inputs_container: list|None = None, read_only = False) -> QWidget:
@@ -594,6 +683,6 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.showMaximized()
+    window.show()
     sys.exit(app.exec())
 
