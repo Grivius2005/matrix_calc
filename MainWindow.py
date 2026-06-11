@@ -231,8 +231,8 @@ class MainWindow(QMainWindow):
         eq_label.setFont(QFont("Courier New", 30))
         h_layout.addWidget(eq_label)
 
-        add_result = self.generate_input_grid(self.rows1, self.cols1, self.add_result, True)
-        h_layout.addWidget(add_result, 5)
+        subtract_result = self.generate_input_grid(self.rows1, self.cols1, self.subtract_result, True)
+        h_layout.addWidget(subtract_result, 5)
 
         v_layout.addWidget(main_area, 5)
 
@@ -479,9 +479,10 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(view_index)
 
     @staticmethod
-    def generate_input_grid(rows: int, cols: int, inputs_container = None, read_only = False) -> QWidget:
+    def generate_input_grid(rows: int, cols: int, inputs_container: list|None = None, read_only = False) -> QWidget:
         if inputs_container is None:
             inputs_container = []
+        inputs_container.clear()
         input_widget = QWidget()
         grid = QGridLayout(input_widget)
         grid.setHorizontalSpacing(5)
