@@ -43,6 +43,9 @@ class MainWindow(QMainWindow):
         self.reverse_inputs = []
         self.reverse_result = []
 
+        self.trace_inputs = []
+        self.trace_result = None
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -88,6 +91,8 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_transpose_view())
         self.stack.addWidget(self.__gen_det_view())
         self.stack.addWidget(self.__gen_reverse_view())
+        self.stack.addWidget(QWidget())
+        self.stack.addWidget(self.__gen_trace_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -98,6 +103,8 @@ class MainWindow(QMainWindow):
         transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
         det_view_option.triggered.connect(lambda: self.__change_refresh_view(5, self.rows1, self.cols1, self.rows2, self.cols2))
         reverse_view_option.triggered.connect(lambda: self.__change_refresh_view(6, self.rows1, self.cols1, self.rows2, self.cols2))
+
+        trace_view_option.triggered.connect(lambda: self.__change_refresh_view(8, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -696,6 +703,92 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(reverse_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return reverse_view
+    
+    def __gen_power_view(self) -> QWidget:
+        pass
+    
+    def __gen_trace_view(self) -> QWidget:
+        self.cols1 = self.rows1
+
+        trace_view = QWidget()
+        trace_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(trace_view)
+        trace_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(8, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(8, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        trace_inputs = self.generate_input_grid(self.rows1, self.cols1, self.trace_inputs)
+        h_layout.addWidget(trace_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label, 5)
+
+        trace_result = QDoubleSpinBox()
+        trace_result.setButtonSymbols(QDoubleSpinBox.ButtonSymbols.NoButtons)
+        trace_result.setFixedSize(65, 25)
+        trace_result.setSingleStep(0.1)
+        trace_result.setDecimals(4)
+        trace_result.setRange(-9999, 9999)
+        trace_result.setValue(0.0)
+        trace_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.trace_result = trace_result
+
+        h_layout.addWidget(trace_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        trace_button = QPushButton("Trace")
+        trace_button.setFixedSize(250, 50)
+        trace_button.setFont(QFont("Courier New", 25))
+        trace_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        trace_button.clicked.connect(lambda: print(self.trace_result))
+
+        v_layout.addWidget(trace_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return trace_view
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
@@ -725,6 +818,8 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_det_view())
             case 6:
                 self.stack.insertWidget(view_index, self.__gen_reverse_view())
+            case 8:
+                self.stack.insertWidget(view_index, self.__gen_trace_view())
             case _:
                 pass
 
