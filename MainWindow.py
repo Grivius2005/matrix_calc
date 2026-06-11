@@ -30,6 +30,10 @@ class MainWindow(QMainWindow):
         self.times_inputs = []
         self.times_result = []
 
+        self.timem_inputs1 = []
+        self.timem_inputs2 = []
+        self.timem_result = []
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -69,12 +73,14 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_add_view())
         self.stack.addWidget(self.__gen_subtract_view())
         self.stack.addWidget(self.__gen_times_view())
+        self.stack.addWidget(self.__gen_timem_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
         add_view_option.triggered.connect(lambda: self.__change_refresh_view(0, self.rows1, self.cols1, self.rows2, self.cols2))
         subtract_view_option.triggered.connect(lambda: self.__change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
         timesk_view_option.triggered.connect(lambda: self.__change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
+        timesm_view_option.triggered.connect(lambda: self.__change_refresh_view(3, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -275,9 +281,11 @@ class MainWindow(QMainWindow):
         cols_input.setRange(1, 5)
         cols_input.setValue(self.cols1)
 
+        h_layout.addWidget(cols_input)
+
         rows_input.valueChanged.connect(lambda: self.__change_refresh_view(2, rows_input.value(), cols_input.value()))
         cols_input.valueChanged.connect(lambda: self.__change_refresh_view(2, rows_input.value(), cols_input.value()))
-        h_layout.addWidget(cols_input)
+
 
         v_layout.addWidget(header)
 
@@ -325,6 +333,118 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(times_button, alignment = Qt.AlignmentFlag.AlignCenter)
 
         return times_view
+
+    def __gen_timem_view(self):
+        timem_view = QWidget()
+        timem_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(timem_view)
+        timem_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Sizes:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows1_input = QSpinBox()
+        rows1_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows1_input.setFixedSize(75, 25)
+        rows1_input.lineEdit().setReadOnly(True)
+        rows1_input.setRange(1, 5)
+        rows1_input.setValue(self.rows1)
+        h_layout.addWidget(rows1_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols1_input = QSpinBox()
+        cols1_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols1_input.setFixedSize(75, 25)
+        cols1_input.lineEdit().setReadOnly(True)
+        cols1_input.setRange(1, 5)
+        cols1_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols1_input)
+
+        sem_label = QLabel("; ")
+        sem_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sem_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(sem_label)
+
+        rows2_input = QSpinBox()
+        rows2_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows2_input.setFixedSize(75, 25)
+        rows2_input.lineEdit().setReadOnly(True)
+        rows2_input.setRange(1, 5)
+        rows2_input.setValue(self.cols1)
+        h_layout.addWidget(rows2_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols2_input = QSpinBox()
+        cols2_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols2_input.setFixedSize(75, 25)
+        cols2_input.lineEdit().setReadOnly(True)
+        cols2_input.setRange(1, 5)
+        cols2_input.setValue(self.cols2)
+
+        h_layout.addWidget(cols2_input)
+
+        rows1_input.valueChanged.connect(lambda: self.__change_refresh_view(3, rows1_input.value(), cols1_input.value(), cols1_input.value(), cols2_input.value()))
+        cols1_input.valueChanged.connect(lambda: self.__change_refresh_view(3, rows1_input.value(), cols1_input.value(), cols1_input.value(), cols2_input.value()))
+        rows2_input.valueChanged.connect(lambda: self.__change_refresh_view(3, rows1_input.value(), rows2_input.value(), rows2_input.value(), cols2_input.value()))
+        cols2_input.valueChanged.connect(lambda: self.__change_refresh_view(3, rows1_input.value(), rows2_input.value(), rows2_input.value(), cols2_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        timem_inputs1 = self.generate_input_grid(self.rows1, self.cols1, self.timem_inputs1)
+        h_layout.addWidget(timem_inputs1, 5)
+
+        h_layout.addWidget(timem_inputs1, 5)
+
+        times_label = QLabel("*")
+        times_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        times_label.setFont(QFont("Courier New", 30))
+
+        h_layout.addWidget(times_label, 5)
+
+        timem_inputs2 = self.generate_input_grid(self.cols1, self.cols2, self.timem_inputs2)
+        h_layout.addWidget(timem_inputs2, 5)
+
+        eq_label = QLabel("=")
+        eq_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        eq_label.setFont(QFont("Courier New", 30))
+        h_layout.addWidget(eq_label, 5)
+
+        timem_result = self.generate_input_grid(self.rows1, self.cols2, self.timem_result, True)
+        h_layout.addWidget(timem_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        times_button = QPushButton("Multiply")
+        times_button.setFixedSize(250, 50)
+        times_button.setFont(QFont("Courier New", 25))
+        times_button.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        v_layout.addWidget(times_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return timem_view
+
         
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
@@ -346,6 +466,8 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_subtract_view())
             case 2:
                 self.stack.insertWidget(view_index, self.__gen_times_view())
+            case 3:
+                self.stack.insertWidget(view_index, self.__gen_timem_view())
             case _:
                 pass
 
