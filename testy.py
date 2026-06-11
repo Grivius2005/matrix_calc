@@ -46,6 +46,28 @@ if __name__ == '__main__':
     except ValueError as e:
         print(e)
 
+    print("\ntest sprawdzajacy rozmiar macierzy:")
+    try:
+        print(mat1.size())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat2.size())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat3.size())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat4.size())
+    except ValueError as e:
+        print(e)
+    try:
+        print(mat5.size())
+    except ValueError as e:
+        print(e)
+
     #trace()
     print("\ntrace:")
     try:
