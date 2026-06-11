@@ -32,6 +32,20 @@ if __name__ == '__main__':
                    [2, 4, 6, 7],
                    [1, 0, 0, 0]])
 
+    print("\ntest konstruktora macierzy jednostkowej:")
+
+    identity_matrix = Matrix(rows = 3, cols = 3)
+    try:
+        print(identity_matrix.data)
+    except ValueError as e:
+        print(e)
+
+    identity_matrix = Matrix([[1, 0], [0, 1]])
+    try:
+        print(identity_matrix.data)
+    except ValueError as e:
+        print(e)
+
     #trace()
     print("\ntrace:")
     try:
