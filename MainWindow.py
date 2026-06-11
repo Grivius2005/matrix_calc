@@ -34,6 +34,9 @@ class MainWindow(QMainWindow):
         self.timem_inputs2 = []
         self.timem_result = []
 
+        self.transpose_inputs = []
+        self.transpose_result = []
+
         #Toolbar
         toolbar = QToolBar("Toolbar")
         toolbar.setFont(QFont("Courier New", 12))
@@ -74,6 +77,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_subtract_view())
         self.stack.addWidget(self.__gen_times_view())
         self.stack.addWidget(self.__gen_timem_view())
+        self.stack.addWidget(self.__gen_transpose_view())
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -81,6 +85,7 @@ class MainWindow(QMainWindow):
         subtract_view_option.triggered.connect(lambda: self.__change_refresh_view(1, self.rows1, self.cols1, self.rows2, self.cols2))
         timesk_view_option.triggered.connect(lambda: self.__change_refresh_view(2, self.rows1, self.cols1, self.rows2, self.cols2))
         timesm_view_option.triggered.connect(lambda: self.__change_refresh_view(3, self.rows1, self.cols1, self.rows2, self.cols2))
+        transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -338,6 +343,8 @@ class MainWindow(QMainWindow):
         return times_view
 
     def __gen_timem_view(self) -> QWidget:
+        self.cols1 = self.rows2
+
         timem_view = QWidget()
         timem_view.setContentsMargins(25, 25, 25, 25)
 
@@ -386,7 +393,7 @@ class MainWindow(QMainWindow):
         rows2_input.setFixedSize(75, 25)
         rows2_input.lineEdit().setReadOnly(True)
         rows2_input.setRange(1, 5)
-        rows2_input.setValue(self.cols1)
+        rows2_input.setValue(self.rows2)
         h_layout.addWidget(rows2_input)
 
         x_label = QLabel("X")
@@ -449,6 +456,78 @@ class MainWindow(QMainWindow):
 
         return timem_view
 
+    def __gen_transpose_view(self) -> QWidget:
+        transpose_view = QWidget()
+        transpose_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(transpose_view)
+        transpose_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(4, rows_input.value(), cols_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(4, rows_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        transpose_inputs = self.generate_input_grid(self.rows1, self.cols1, self.transpose_inputs)
+        h_layout.addWidget(transpose_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label)
+
+        transpose_result = self.generate_input_grid(self.cols1, self.rows1, self.transpose_result)
+        h_layout.addWidget(transpose_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        transpose_button = QPushButton("Transpose")
+        transpose_button.setFixedSize(250, 50)
+        transpose_button.setFont(QFont("Courier New", 25))
+        transpose_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        transpose_button.clicked.connect(lambda: print(self.transpose_result))
+
+        v_layout.addWidget(transpose_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return transpose_view
+
         
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
@@ -473,10 +552,13 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_times_view())
             case 3:
                 self.stack.insertWidget(view_index, self.__gen_timem_view())
+            case 4:
+                self.stack.insertWidget(view_index, self.__gen_transpose_view())
             case _:
                 pass
 
         self.stack.setCurrentIndex(view_index)
+
 
     @staticmethod
     def generate_input_grid(rows: int, cols: int, inputs_container: list|None = None, read_only = False) -> QWidget:
