@@ -68,25 +68,24 @@ class Matrix:
         return col1 == row2
 
     def __mul__(self, other: Union[Matrix, float, int]) -> Matrix:
-        # Mnożenie przez skalar
         if isinstance(other, (float, int)):
-            rows, cols = self.size()
-            result_data = [
-                [self.__matrix[i][j] * other for j in range(cols)]
-                for i in range(rows)
-            ]
-            return Matrix(result_data)
+            result_data = [[val * other for val in row] for row in self.__matrix]
+            return Matrix(_matrix = result_data)
         elif isinstance(other, Matrix):
-            # Mnożenie przez macierz
-            if not self.is_it_ok_to_multiply(other):
+            if not Matrix.can_be_multiplied(self, other):
                 raise ValueError("Niezgodne wymiary do mnożenia macierzy.")
-            # zamiana na obiekty biblioteki numpy
-            mat1_np = np.array(self.__matrix)
-            mat2_np = np.array(other.__matrix)
-            # wykorzystanie funkcji mnozenia macierzy z biblioteki numpy
-            result = mat1_np @ mat2_np
-            # zwrocony wynik przekonwertowany z powrotem na obiekt klasy Matrix
-            return Matrix(_matrix=result.tolist())
+
+            rows_a, cols_a = self.size()
+            rows_b, cols_b = other.size()
+
+            result_data = [[0.0] * cols_b for _ in range(rows_a)]
+            for i in range(rows_a):
+                for j in range(cols_b):
+                    for k in range(cols_a):
+                        result_data[i][j] += self.__matrix[i][k] * other.data[k][j]
+            return Matrix(_matrix = result_data)
+        else:
+            raise TypeError("Mnożenie obsługiwane tylko dla typu Matrix, float lub int.")
 
     def __pow__(self, k: int) -> Matrix:
         rows, cols = self.size()
@@ -96,7 +95,7 @@ class Matrix:
             raise ValueError("Obsługiwane są tylko nieujemne potęgi.")
 
         result = Matrix(rows=rows, cols=cols)
-        base = Matrix(data=self.__matrix)
+        base = Matrix(_matrix = self.__matrix)
 
         for _ in range(k):
             result = result * base
@@ -184,20 +183,6 @@ class Matrix:
             cofactor_data.append(cofactor_row)
         return Matrix(cofactor_data)
 
-    def inverse(self):
-        rows, cols = self.size()
-        # sprawdzenmie czy macierz jest kwadratowa
-        if rows != cols:
-            raise ValueError("Niezgodne wymiary macierzy")
-        # sprawdzenie czy wyznacznik nie jest  0
-        if abs(self.determinant()) < 1e-12:  # brak metody determinant
-            raise ValueError("Macierz ma zerowy wyznacznik")
-        # konwersja na np.array i obliczenie odwrotności
-        np_mat = np.array(self.__matrix)
-        inv = np.linalg.inv(np_mat)
-        # wynik zwracany jako obiekt klasy Matrix
-        return Matrix(inv.tolist())
-
     def jordan(self) -> tuple[Matrix, Matrix, Matrix]:
         from sympy import Matrix as SymMatrix
 
@@ -218,4 +203,6 @@ class Matrix:
     def have_same_size(a: Matrix, b: Matrix) -> bool:
         return a.size() == b.size()
 
-
+    @staticmethod
+    def can_be_multiplied(a: Matrix, b: Matrix) -> bool:
+        return a.size()[1] == b.size()[0]
