@@ -51,7 +51,10 @@ class MainWindow(QMainWindow):
         self.trace_inputs = []
         self.trace_result = None
 
+        self.cofactor_inputs = []
+        self.cofactor_result = []
 
+        self.unit_result = []
 
         #Toolbar
         toolbar = QToolBar("Toolbar")
@@ -100,6 +103,9 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_reverse_view())
         self.stack.addWidget(self.__gen_power_view())
         self.stack.addWidget(self.__gen_trace_view())
+        self.stack.addWidget(self.__gen_cofactor_view())
+        self.stack.addWidget(self.__gen_unit_view())
+
         self.setCentralWidget(self.stack)
 
         #Toolbar connection
@@ -112,6 +118,8 @@ class MainWindow(QMainWindow):
         reverse_view_option.triggered.connect(lambda: self.__change_refresh_view(6, self.rows1, self.cols1, self.rows2, self.cols2))
         power_view_option.triggered.connect(lambda: self.__change_refresh_view(7, self.rows1, self.cols1, self.rows2, self.cols2))
         trace_view_option.triggered.connect(lambda: self.__change_refresh_view(8, self.rows1, self.cols1, self.rows2, self.cols2))
+        cofactor_view_option.triggered.connect(lambda: self.__change_refresh_view(9, self.rows1, self.cols1, self.rows2, self.cols2))
+        unit_view_option.triggered.connect(lambda: self.__change_refresh_view(10, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
         self.setWindowTitle("Matrix Calculator")
@@ -883,6 +891,140 @@ class MainWindow(QMainWindow):
         v_layout.addWidget(trace_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return trace_view
+    
+    def __gen_cofactor_view(self) -> QWidget:
+        self.cols1 = self.rows1
+
+        cofactor_view = QWidget()
+        cofactor_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(cofactor_view)
+        cofactor_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(9, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(9, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        cofactor_inputs = self.generate_input_grid(self.rows1, self.cols1, self.cofactor_inputs)
+        h_layout.addWidget(cofactor_inputs, 5)
+
+        arr_label = QLabel("→")
+        arr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        arr_label.setFont(QFont("Courier New", 40))
+        h_layout.addWidget(arr_label)
+
+        cofactor_result = self.generate_input_grid(self.cols1, self.rows1, self.cofactor_result)
+        h_layout.addWidget(cofactor_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        cofactor_button = QPushButton("Cofactor")
+        cofactor_button.setFixedSize(250, 50)
+        cofactor_button.setFont(QFont("Courier New", 25))
+        cofactor_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        cofactor_button.clicked.connect(lambda: print(self.cofactor_result))
+
+        v_layout.addWidget(cofactor_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return cofactor_view
+
+    def __gen_unit_view(self) -> QWidget:
+        self.cols1 = self.rows1
+
+        unit_view = QWidget()
+
+        v_layout = QVBoxLayout(unit_view)
+        unit_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(10, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(10, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        unit_result = self.generate_input_grid(self.cols1, self.rows1, self.unit_result)
+
+        v_layout.addWidget(unit_result, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        unit_button = QPushButton("Unit")
+        unit_button.setFixedSize(250, 50)
+        unit_button.setFont(QFont("Courier New", 25))
+        unit_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        unit_button.clicked.connect(lambda: print(self.unit_result))
+
+        v_layout.addWidget(unit_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return unit_view
+
 
     def __change_refresh_view(self, view_index: int, rows1: int, cols1: int, rows2: int|None = None, cols2: int|None = None) -> None:
         self.rows1 = rows1
@@ -916,6 +1058,10 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_power_view())
             case 8:
                 self.stack.insertWidget(view_index, self.__gen_trace_view())
+            case 9:
+                self.stack.insertWidget(view_index, self.__gen_cofactor_view())
+            case 10:
+                self.stack.insertWidget(view_index, self.__gen_unit_view())
             case _:
                 pass
 
