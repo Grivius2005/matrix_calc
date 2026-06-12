@@ -1,5 +1,5 @@
 from matrix import Matrix
-from memory import Memory
+#from memory import Memory
 
 
 def print_matrix(m):
@@ -233,4 +233,39 @@ if __name__ == '__main__':
     except ValueError as e:
         print(e)
 
+    print("\ntest odejmowania macierzy:")
+    try:
+        add_matrix_result1 = mat1 - mat2
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat3 - mat4
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat4 - mat3
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat2 - mat5
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat2 - mat2
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat5 - mat5
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
+    try:
+        add_matrix_result1 = mat7 - mat7
+        print(add_matrix_result1.data)
+    except ValueError as e:
+        print(e)
 
