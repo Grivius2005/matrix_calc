@@ -43,8 +43,15 @@ class MainWindow(QMainWindow):
         self.reverse_inputs = []
         self.reverse_result = []
 
+        self.power_inputs = []
+        self.power_exponent = None
+        self.power_result = []
+
+
         self.trace_inputs = []
         self.trace_result = None
+
+
 
         #Toolbar
         toolbar = QToolBar("Toolbar")
@@ -91,7 +98,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.__gen_transpose_view())
         self.stack.addWidget(self.__gen_det_view())
         self.stack.addWidget(self.__gen_reverse_view())
-        self.stack.addWidget(QWidget())
+        self.stack.addWidget(self.__gen_power_view())
         self.stack.addWidget(self.__gen_trace_view())
         self.setCentralWidget(self.stack)
 
@@ -103,7 +110,7 @@ class MainWindow(QMainWindow):
         transpose_view_option.triggered.connect(lambda: self.__change_refresh_view(4, self.rows1, self.cols1, self.rows2, self.cols2))
         det_view_option.triggered.connect(lambda: self.__change_refresh_view(5, self.rows1, self.cols1, self.rows2, self.cols2))
         reverse_view_option.triggered.connect(lambda: self.__change_refresh_view(6, self.rows1, self.cols1, self.rows2, self.cols2))
-
+        power_view_option.triggered.connect(lambda: self.__change_refresh_view(7, self.rows1, self.cols1, self.rows2, self.cols2))
         trace_view_option.triggered.connect(lambda: self.__change_refresh_view(8, self.rows1, self.cols1, self.rows2, self.cols2))
 
         #Initialisation
@@ -705,7 +712,94 @@ class MainWindow(QMainWindow):
         return reverse_view
     
     def __gen_power_view(self) -> QWidget:
-        pass
+        self.cols1 = self.rows1
+
+        power_view = QWidget()
+        power_view.setContentsMargins(25, 25, 25, 25)
+
+        v_layout = QVBoxLayout(power_view)
+        power_view.setLayout(v_layout)
+
+        header = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setLayout(h_layout)
+
+        size_label = QLabel("Size:")
+        size_label.setFont(QFont("Courier New", 20))
+        size_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h_layout.addWidget(size_label)
+
+        rows_input = QSpinBox()
+        rows_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        rows_input.setFixedSize(75, 25)
+        rows_input.lineEdit().setReadOnly(True)
+        rows_input.setRange(1, 5)
+        rows_input.setValue(self.rows1)
+        h_layout.addWidget(rows_input)
+
+        x_label = QLabel("X")
+        x_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        x_label.setFont(QFont("Courier New", 12))
+        h_layout.addWidget(x_label)
+
+        cols_input = QSpinBox()
+        cols_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        cols_input.setFixedSize(75, 25)
+        cols_input.lineEdit().setReadOnly(True)
+        cols_input.setRange(1, 5)
+        cols_input.setValue(self.cols1)
+
+        h_layout.addWidget(cols_input)
+
+        rows_input.valueChanged.connect(lambda: self.__change_refresh_view(7, rows_input.value(), rows_input.value()))
+        cols_input.valueChanged.connect(lambda: self.__change_refresh_view(7, cols_input.value(), cols_input.value()))
+
+        v_layout.addWidget(header)
+
+        main_area = QWidget()
+        h_layout = QHBoxLayout(header)
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_area.setLayout(h_layout)
+
+        power_inputs = self.generate_input_grid(self.rows1, self.cols1, self.power_inputs)
+        h_layout.addWidget(power_inputs, 5)
+
+        power_label = QLabel("^")
+        power_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        power_label.setFont(QFont("Courier New", 30))
+
+        h_layout.addWidget(power_label, 5)
+
+        s_input = QSpinBox()
+        s_input.setButtonSymbols(QSpinBox.ButtonSymbols.NoButtons)
+        s_input.setFixedSize(65, 25)
+        s_input.setRange(-9999, 9999)
+        s_input.setValue(0)
+        s_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.power_exponent = s_input
+
+        h_layout.addWidget(s_input, 5)
+
+        eq_label = QLabel("=")
+        eq_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        eq_label.setFont(QFont("Courier New", 30))
+        h_layout.addWidget(eq_label, 5)
+
+        power_result = self.generate_input_grid(self.rows1, self.cols1, self.power_result, True)
+        h_layout.addWidget(power_result, 5)
+
+        v_layout.addWidget(main_area, 5)
+
+        power_button = QPushButton("Power")
+        power_button.setFixedSize(250, 50)
+        power_button.setFont(QFont("Courier New", 25))
+        power_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        power_button.clicked.connect(lambda: print(self.power_result))
+
+        v_layout.addWidget(power_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        return power_view
     
     def __gen_trace_view(self) -> QWidget:
         self.cols1 = self.rows1
@@ -818,6 +912,8 @@ class MainWindow(QMainWindow):
                 self.stack.insertWidget(view_index, self.__gen_det_view())
             case 6:
                 self.stack.insertWidget(view_index, self.__gen_reverse_view())
+            case 7:
+                self.stack.insertWidget(view_index, self.__gen_power_view())
             case 8:
                 self.stack.insertWidget(view_index, self.__gen_trace_view())
             case _:
