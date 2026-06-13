@@ -1,5 +1,5 @@
 from matrix import Matrix
-#from memory import Memory
+from memory import Memory
 
 
 def print_matrix(m):
