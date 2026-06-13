@@ -1,5 +1,6 @@
 from matrix import Matrix
 from memory import Memory
+from operation_model import OperationModel
 
 
 def print_matrix(m):
@@ -269,3 +270,25 @@ if __name__ == '__main__':
     except ValueError as e:
         print(e)
 
+    print("Test pamięci operacji")
+    memory = Memory(size=10)
+    mat_test = Matrix(rows=2, cols=2)
+
+    try:
+        for i in range(1, 13):
+            op = OperationModel(op_id = i, matrix1=mat_test, matrix2=mat_test, result=mat_test)
+            memory.addo_op(op)
+            print(f"Dodano operację ID: {i} | Aktualne zapełnienie pamięci: {memory.size()}/10")
+
+        print(f"Ostateczny rozmiar pamięci: {memory.size()} (Oczekiwane: 10)")
+
+        zapisane_id = [memory[k].opId for k in range(memory.size())]
+        print(f"ID operacji aktualnie znajdujących się w pamięci: {zapisane_id}")
+
+        if zapisane_id == [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
+            print("WYNIK: SUKCES! Najstarsze operacje (1 i 2) zostały poprawnie nadpisane.")
+        else:
+            print("WYNIK: BŁĄD! Pamięć nie nadpisuje starych operacji prawidłowo.")
+
+    except Exception as e:
+        print(f"BŁĄD: Wystąpił nieoczekiwany wyjątek podczas testu: {e}")
